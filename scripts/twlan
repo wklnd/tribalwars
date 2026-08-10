@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+# twlan — start / stop the local TWLAN2 game (backend :8080 + frontend dev server :5173).
+#
+#   twlan start [backend|frontend]     start both (default) or one of them, in the background
+#   twlan stop  [backend|frontend]     stop both (default) or one of them
+#   twlan restart [backend|frontend]
+#   twlan status
+#
+# Logs: ~/.local/state/twlan/{backend,frontend}.log
+# The backend is bound to 127.0.0.1 (it also serves the admin API and the H2 console). The frontend binds to the Tailscale
+# IP when there is one (so the game is reachable away from home), else 127.0.0.1; override with TWLAN_HOST=<ip>.
+# Never binds 0.0.0.0. The backend is never SIGKILLed: it holds the H2 save, so it gets time to close the database.
+set -u
+
+SELF="$(readlink -f "${BASH_SOURCE[0]}")"
+ROOT="$(dirname "$(dirname "$SELF")")"
+STATE="${XDG_STATE_HOME:-$HOME/.local/state}/twlan"
+BACKEND_PORT=8080
+FRONTEND_PORT=5173
+mkdir -p "$STATE"
+
+host() {
+  local h="${TWLAN_HOST:-}"
+  [ -z "$h" ] && command -v tailscale >/dev/null 2>&1 && h="$(tailscale ip -4 2>/dev/null | head -1)"
+  h="${h:-127.0.0.1}"
+  if [ "$h" = "0.0.0.0" ] || [ "$h" = "::" ]; then
+    echo "twlan: refusing to bind $h (the game would be exposed on the LAN); set TWLAN_HOST to one address" >&2
+    exit 2
+  fi
+  echo "$h"
+}
+
+# pid of whatever listens on a TCP port (empty when nothing does)
+listener() {
+  ss -ltnpH "sport = :$1" 2>/dev/null | grep -o 'pid=[0-9]*' | head -1 | cut -d= -f2
+}
+
+wait_for() { # <seconds> <command...>
+  local n="$1"; shift
+  for _ in $(seq 1 "$n"); do "$@" && return 0; sleep 1; done
+  return 1
+}
+
+backend_up() { [ "$(curl -s -o /dev/null -w '%{http_code}' -m 2 "http://127.0.0.1:$BACKEND_PORT/api/worlds")" = "200" ]; }
+frontend_up() { [ -n "$(listener $FRONTEND_PORT)" ]; }
+
+start_backend() {
+  local pid; pid="$(listener $BACKEND_PORT)"
+  if [ -n "$pid" ]; then echo "backend:  already running (pid $pid)"; return 0; fi
+  echo "backend:  starting (log: $STATE/backend.log) ..."
+  (cd "$ROOT/backend" || exit 1; setsid nohup ./gradlew bootRun --args='--server.address=127.0.0.1' >"$STATE/backend.log" 2>&1 & echo $! >"$STATE/backend.pid")
+  if wait_for 180 backend_up; then
+    echo "backend:  up on http://127.0.0.1:$BACKEND_PORT (pid $(listener $BACKEND_PORT))"
+  else
+    echo "backend:  did not come up within 3 minutes — see $STATE/backend.log" >&2
+    return 1
+  fi
+}
+
+start_frontend() {
+  local pid h; pid="$(listener $FRONTEND_PORT)"
+  if [ -n "$pid" ]; then echo "frontend: already running (pid $pid)"; return 0; fi
+  h="$(host)" || exit 2
+  [ -d "$ROOT/frontend/node_modules" ] || (cd "$ROOT/frontend" && npm install)
+  echo "frontend: starting (log: $STATE/frontend.log) ..."
+  (cd "$ROOT/frontend" || exit 1; setsid nohup npx vite --host "$h" --port $FRONTEND_PORT --strictPort >"$STATE/frontend.log" 2>&1 &)
+  if wait_for 30 frontend_up; then
+    echo "frontend: up on http://$h:$FRONTEND_PORT/ (pid $(listener $FRONTEND_PORT))"
+  else
+    echo "frontend: did not come up — see $STATE/frontend.log" >&2
+    return 1
+  fi
+}
+
+stop_backend() {
+  local pid; pid="$(listener $BACKEND_PORT)"
+  if [ -z "$pid" ]; then echo "backend:  not running"; return 0; fi
+  echo "backend:  stopping (pid $pid) ..."
+  kill "$pid" # SIGTERM: Spring shuts down and closes the H2 file
+  if ! wait_for 60 bash -c "! kill -0 $pid 2>/dev/null"; then
+    echo "backend:  still shutting down after 60 s; not forcing it (H2 save). Check: ps -p $pid" >&2
+    return 1
+  fi
+  # the gradle client that launched it ends by itself once the app is gone; clean up if it lingers
+  local g; g="$(cat "$STATE/backend.pid" 2>/dev/null)"
+  [ -n "$g" ] && kill -0 "$g" 2>/dev/null && kill "$g" 2>/dev/null
+  rm -f "$STATE/backend.pid"
+  echo "backend:  stopped"
+}
+
+stop_frontend() {
+  local pid; pid="$(listener $FRONTEND_PORT)"
+  if [ -z "$pid" ]; then echo "frontend: not running"; return 0; fi
+  echo "frontend: stopping (pid $pid) ..."
+  kill "$pid"
+  wait_for 10 bash -c "! kill -0 $pid 2>/dev/null" || kill -9 "$pid" 2>/dev/null
+  echo "frontend: stopped"
+}
+
+status() {
+  local b f
+  b="$(listener $BACKEND_PORT)"; f="$(listener $FRONTEND_PORT)"
+  [ -n "$b" ] && echo "backend:  running (pid $b) on port $BACKEND_PORT" || echo "backend:  stopped"
+  [ -n "$f" ] && echo "frontend: running (pid $f) on port $FRONTEND_PORT" || echo "frontend: stopped"
+}
+
+cmd="${1:-}"; what="${2:-all}"
+case "$what" in all|backend|frontend) ;; *) echo "twlan: unknown part '$what' (backend | frontend)" >&2; exit 2 ;; esac
+do_start() { [ "$what" != frontend ] && start_backend; [ "$what" != backend ] && start_frontend; return 0; }
+do_stop()  { [ "$what" != backend ] && stop_frontend;  [ "$what" != frontend ] && stop_backend;  return 0; }
+case "$cmd" in
+  start)   do_start ;;
+  stop)    do_stop ;;
+  restart) do_stop; do_start ;;
+  status)  status ;;
+  *) echo "usage: twlan start|stop|restart [backend|frontend]   |   twlan status" >&2; exit 2 ;;
+esac

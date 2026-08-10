@@ -1,0 +1,5 @@
+# Never let the real save (or a build's H2 file) end up in a build context or image layer.
+data/
+build/
+.gradle/
+*.log

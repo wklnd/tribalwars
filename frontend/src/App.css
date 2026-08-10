@@ -1,0 +1,80 @@
+/* All page chrome, tables, buttons and widget styling come from the original
+   game's own stylesheets (public/game.css + public/overview.css, loaded in
+   index.html). Only things the original doesn't have live here. */
+
+.tw-error {
+  margin: 6px 0;
+}
+
+.map-grid {
+  display: inline-flex;
+  flex-direction: column;
+  border: 1px solid #7d510f;
+  overflow: hidden;
+  background: #333;
+}
+
+.map-row {
+  display: flex;
+}
+
+.map-tile {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #6f8f45;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.map-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.map-tile.is-village { background: #cfa15a; }
+.map-tile.is-barbarian { background: #a5583d; }
+
+.tw-input-num {
+  width: 60px;
+}
+
+.tw-empty {
+  padding: 6px;
+  color: #6b5a3a;
+}
+
+
+/* ---- achievements (the original's graphic/awards/ui images are not in the bundle, so the group boxes are drawn here) ---- */
+.award-group-head {
+  background: #c1a264 url(/graphic/tableheader_bg3.png) repeat-x;
+  border: 1px solid #7d510f;
+  border-bottom: none;
+  color: #3b2308;
+  font-weight: bold;
+  height: 26px;
+  line-height: 26px;
+}
+.award-group-content {
+  background: #f4e4bc;
+  border: 1px solid #7d510f;
+  border-top: none;
+  border-bottom: none;
+}
+.award-group-content hr {
+  background: url(/graphic/awards/ui/sep.png);
+}
+.award-group-foot {
+  background: #f4e4bc;
+  border: 1px solid #7d510f;
+  border-top: none;
+  height: 6px;
+}
+.award img {
+  margin: 7px;
+}
+.award-desc .progress-bar {
+  margin-top: 3px;
+}

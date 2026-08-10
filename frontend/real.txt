@@ -1,0 +1,117 @@
+<div#pbar>
+  <div.pb-outer.pb-outer-zz>
+    <div.pb-inner>
+  <div.pb-tab>
+<div.l-wrapper>
+  <header>
+    <div#top>
+    <nav.l-header>
+      <div.l-constrained.l-constrained-alt>
+        <div.menu-mobile>
+          <span>
+          <div.menu-text>
+            "Menu"
+        <ul.menu-primary.l-clearfix.l-inline-list>
+          <li>
+            <a#headerlink-home.is-active>
+              "TWLan.org"
+          <li>
+            <a#headerlink-forum.external>
+              "TWLan.org"
+          <li>
+            <a#headerlink-logout.>
+              "Logout"
+          <li>
+            <a#headerlink-admin.>
+              "Admin Panel"
+    <div.l-header-content>
+      <div.l-constrained.l-constrained-reg.l-clearfix>
+        <div#world-select.dialog.worlds>
+          <div.container>
+            <div.container-inner>
+              <div.world-select-header>
+                <p>
+                  "Hello Nilsen, on which world would you like to play?"
+              <div.inner-content>
+                <div.world-select.entered.l-clearfix>
+                  <h3>
+                    "Active worlds"
+                  <ul.l-list-vertical.is-multiple>
+                    <li>
+                      <a>
+                        "Welt 1"
+              <div.container-extension.apps.l-center-block.l-clearfix>
+            <div.top-left>
+            <div.top-right>
+            <div.middle-top>
+            <div.middle-bottom>
+            <div.middle-left>
+            <div.middle-right>
+            <div.bottom-left>
+            <div.bottom-right>
+  <section.l-content>
+    <div.content-drop>
+    <div.ornament.ornament-top-right>
+    <div.ornament.ornament-top-left>
+    <div.ornament.ornament-bottom-left>
+    <div.ornament.ornament-bottom-right>
+    <div.l-section-divider>
+    <div.l-constrained>
+      <div.l-clearfix>
+        <div#pagination3.pagination.l-center.l-clearfix>
+  <div.l-footer>
+    <footer.l-constrained>
+      <ul.l-list-four-col.l-clearfix>
+        <li>
+          <span.link-header>
+            "Game"
+          <ul.l-list-vertical>
+            <li>
+              <a.link-alt>
+                "» 2.A2 (590)"
+        <li>
+          <span.link-header>
+            "Community"
+          <ul.l-list-vertical>
+            <li>
+              <a.link-alt>
+                "» Forum"
+      <div.l-clearfix>
+        <div.links-footer.l-clearfix.l-center-block>
+          <a>
+            "The West"
+          <span>
+            "•"
+          <a>
+            "Grepolis"
+          <span>
+            "•"
+          <a>
+            "Forge of Empires"
+          <span>
+            "•"
+          <a>
+            "Tribal Wars 2"
+          <span>
+            "•"
+          <a>
+            "Elvenar"
+        <div.links-footer.l-clearfix.l-center-block>
+          <a>
+            "© 2003 - 2014 InnoGames GmbH"
+          <span>
+            "•"
+          <a>
+            "Imprint"
+          <span>
+            "•"
+          <a>
+            "Privacy"
+          <span>
+            "•"
+          <a>
+            "Terms & Conditions"
+          <a>
+            "© 2014 TWLan & Contributors"
+    <a#up.one.transparent>
+      "? Go to the top"

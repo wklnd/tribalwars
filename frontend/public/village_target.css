@@ -1,0 +1,197 @@
+/* 23706 trunk*/
+.target-input {
+    background-color: #fff;
+    border: 1px solid #91775e;
+    overflow: hidden;
+    width: 310px;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    margin-bottom: 5px;
+}
+
+.target-input input[type=text] {
+    height: 20px;
+    width: 310px;
+    resize: none;
+    padding: 2px;
+    border: none;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.target-select-autocomplete {
+    width: 310px;
+    border: 1px solid #7d510f;
+    border-top-width: 0px;
+    position: absolute;
+    background-color: #f4e4bc;
+    overflow: auto;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    z-index: 12001;
+}
+
+.target-select-autocomplete::-webkit-scrollbar {
+    width: 4px;
+    background: rgba(148, 75, 45, 0.25);
+}
+
+.target-select-autocomplete::-webkit-scrollbar-thumb {
+    background-color: #90281c;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.target-select-autocomplete::-webkit-scrollbar-thumb:active {
+    background-color: #b43425;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.target-select-autocomplete::-webkit-scrollbar-track {
+    border-radius: 4px;
+}
+
+.village-item {
+    border-bottom: 1px solid #7d510f;
+    background-color: #fff5da;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.village-item.read-only {
+    cursor: auto !important;
+}
+
+.village-item.read-only .village-delete {
+    display: none !important;
+}
+
+.village-item.read-only:hover {
+    background-color: #fff5da !important;
+}
+
+.village-item:last-child {
+    border: none;
+}
+
+.village-item .village-name {
+    font-weight: bold;
+    font-size: 12px;
+    margin-top: 0px;
+}
+
+.village-item .village-delete {
+    float: right;
+}
+
+.village-item .village-picture {
+    float: left;
+    margin-right: 5px;
+}
+
+.village-item .village-info, .village-item .village-distance {
+    display: block;
+    margin-top: 0px;
+    font-size: 87%;
+    line-height: 11px;
+}
+
+.village-item .village-info strong, .village-item .village-distance strong {
+    color: #111111;
+}
+
+.village-item .village-delete {
+    display: none;
+}
+
+.target-input .village-item .village-delete {
+    display: block;
+}
+
+.target-input .village-item {
+    cursor: url(graphic/delete.png), auto;
+}
+
+.village-item.village-selected, .village-item:hover {
+    background-color: #fff3d3;
+}
+
+.village-more {
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.target-quickbutton {
+    display: none;
+    float: left;
+    height: 22px;
+    width: 22px;
+    border: 1px solid #91775e;
+    border-left: none;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background: #fff5da url('graphic/target_icons.png');
+}
+
+.target-quickbutton:hover {
+    background-color: #fff3d3;
+}
+
+.target-last-attacked {
+    background-position: 0 0;
+}
+
+.target-bookmarks {
+    background-position: -20px 0;
+}
+
+.target-recent {
+    background-position: -40px 0;
+}
+
+.target-own {
+    background-position: -60px 0;
+}
+
+.target-select-links {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    width: 320px;
+    margin-top: 5px;
+}
+
+.target-select-links a, .target-select-links span {
+    -webkit-box-flex: 1;
+    -webkit-flex-grow: 1;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
+    -webkit-flex-basis: 120px;
+    -ms-flex-preferred-size: 120px;
+    flex-basis: 120px;
+}
+
+.target-types {
+    margin-bottom: 5px;
+}
+
+.target-select {
+    width: auto;
+    margin-top: 0 !important;
+}
+
+.target-buttons .btn {
+    min-width: 100px;
+    margin-bottom: 5px;
+}
+
+#popup_box_map_command .popup_box_content {
+    min-width: 700px;
+}

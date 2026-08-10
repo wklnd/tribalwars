@@ -1,0 +1,501 @@
+/* 23706 trunk*/
+.ui-resizable {
+    position: relative;
+}
+
+.ui-resizable-handle {
+    position: absolute;
+    font-size: 0.1px;
+    z-index: 99999;
+    display: block;
+}
+
+.ui-resizable-disabled .ui-resizable-handle, .ui-resizable-autohide .ui-resizable-handle {
+    display: none;
+}
+
+#map > .ui-resizable-se, #minimap > .ui-resizable-se {
+    cursor: se-resize;
+    width: 15px;
+    height: 15px;
+    right: 1px;
+    bottom: 1px;
+    z-index: 1002;
+    background-image: url('graphic/map/resizer.png');
+    background-position: 0px 0px;
+}
+
+.map_navigation:hover {
+    cursor: pointer;
+}
+
+.mp {
+    height: 24px;
+    width: 24px;
+    display: block;
+    background-image: url('graphic/map/icons_context.png');
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: 15;
+    opacity: 0;
+}
+
+#mp_res {
+    background-position: 0px 0px;
+}
+
+#mp_res:hover {
+    background-position: 0px -24px;
+}
+
+#mp_att {
+    background-position: -24px 0px;
+}
+
+#mp_att:hover {
+    background-position: -24px -24px;
+}
+
+#mp_lock {
+    background-position: -48px 0px;
+}
+
+#mp_lock:hover {
+    background-position: -48px -24px;
+}
+
+#mp_unlock {
+    background-position: -216px 0px;
+}
+
+#mp_unlock:hover {
+    background-position: -216px -24px;
+}
+
+#mp_fav {
+    background-position: -72px 0px;
+}
+
+#mp_fav:hover {
+    background-position: -72px -24px;
+}
+
+#mp_unfav {
+    background-position: -240px 0px;
+}
+
+#mp_unfav:hover {
+    background-position: -240px -24px;
+}
+
+#mp_msg {
+    background-position: -96px 0px;
+}
+
+#mp_msg:hover {
+    background-position: -96px -24px;
+}
+
+#mp_profile {
+    background-position: -120px 0px;
+}
+
+#mp_profile:hover {
+    background-position: -120px -24px;
+}
+
+#mp_overview {
+    background-position: -360px 0px;
+}
+
+#mp_overview:hover {
+    background-position: -360px -24px;
+}
+
+#mp_recruit {
+    background-position: -168px 0px;
+}
+
+#mp_recruit:hover {
+    background-position: -168px -24px;
+}
+
+#mp_tab {
+    background-position: -192px 0px;
+}
+
+#mp_tab:hover {
+    background-position: -192px -24px;
+}
+
+#mp_farm_a {
+    background-position: -264px 0px;
+}
+
+#mp_farm_a:hover {
+    background-position: -264px -24px;
+}
+
+#mp_farm_b {
+    background-position: -288px 0px;
+}
+
+#mp_farm_b:hover {
+    background-position: -288px -24px;
+}
+
+#mp_info {
+    background-position: -144px 0px;
+}
+
+#mp_info:hover {
+    background-position: -144px -24px;
+}
+
+#mp_invite {
+    background-position: -384px 0px;
+}
+
+#mp_invite:hover {
+    background-position: -384px -24px;
+}
+
+#mp_invite_hide {
+    background-position: -408px 0px;
+}
+
+#mp_invite_hide:hover {
+    background-position: -408px -24px;
+}
+
+.unit_count_home {
+    font-style: italic;
+    color: #333;
+}
+
+.map_border {
+    background-color: #214B18;
+}
+
+.map_border_l {
+    border-color: #214B18;
+}
+
+.map_border_night {
+    background-color: #939696;
+}
+
+.map_border_night_l {
+    border-color: #939696;
+}
+
+.map_con_border {
+    background-color: #000;
+}
+
+.map_con_border_l {
+    border-color: #000;
+}
+
+.map_con_border_night {
+    background-color: #D4D5D5;
+}
+
+.map_con_border_night_l {
+    border-color: #D4D5D5;
+}
+
+#map {
+    display: block;
+}
+
+#map_container {
+    position: relative;
+}
+
+#pmap_options {
+    margin: 0px 0px 9px 20px;
+}
+
+.map_container, #warplanner {
+    background-color: #f4e4bc!important;
+    border: 1px solid #8c5f0d;
+    direction: ltr;
+}
+
+.minimap_container .dir_arrow {
+    cursor: pointer;
+}
+
+#info_bonus_image {
+    background-image: url(graphic/background/content.jpg);
+}
+
+.map_container * {
+    direction: ltr;
+}
+
+#worldmap_border {
+    border: 2px solid #804000;
+    background-color: #F1EBDD;
+    background-image: url(graphic/background/content.jpg);
+}
+
+#worldmap_footer {
+    padding: 2px;
+}
+
+#worldmap fieldset {
+    border: none;
+    margin: 0;
+    display: inline;
+}
+
+#worldmap_body, #worldmap_footer {
+    text-align: center;
+}
+
+#worldmap_image {
+    position: absolute;
+    z-index: 20;
+}
+
+#worldmap_body {
+    margin: auto;
+    overflow: hidden;
+    position: relative;
+}
+
+#map table {
+    border-spacing: 0px;
+    border-collapse: collapse;
+}
+
+.map_container table {
+    border-collapse: collapse !important;
+}
+
+#coord_x td, #coord_y td {
+    padding: 0px;
+}
+
+#coord_x {
+    text-align: center;
+}
+
+#coord_y td {
+    vertical-align: middle;
+}
+
+#map td {
+    padding: 0;
+    margin: 0;
+    background-color: green;
+}
+
+#map img {
+    vertical-align: bottom;
+}
+
+#warplanner {
+    display: none;
+    border: 1px solid #8c5f0d;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+#warplanner_list {
+    float: left;
+    height: 300px;
+    width: 200px;
+    background-color: #aaa;
+}
+
+#warplanner_players > li {
+    list-style-type: none;
+    padding: 2px;
+    border-bottom: 1px solid black;
+}
+
+#warplanner_players tr.selected {
+    background-color: #880000 ! important;
+}
+
+#warplanner_players {
+    border-spacing: 0px;
+    border-collapse: collapse ! important;
+}
+
+#warplanner_content {
+    padding: 10px;
+}
+
+#warplanner_selection {
+    border: 1px solid green;
+    background-color: red;
+    opacity: 0.4;
+    filter: alpha(opacity = 40);
+    border-radius: 3px;
+}
+
+.wp_col {
+    width: 12px;
+    height: 12px;
+}
+
+.centercoord {
+    width: 25px;
+}
+
+#map_canvas {
+    position: absolute;
+}
+
+#map_config {
+    text-align: left;
+}
+
+.map_legend {
+    float: left;
+    min-width: 135px;
+    font-size: xx-small;
+    padding-right: 3px;
+}
+
+.map_legend div {
+    height: 15px;
+    width: 15px;
+    display: inline-block;
+}
+
+.map_legend span {
+    vertical-align: 5px;
+}
+
+.popup_options_toggler, .centercoords_toggler, .pmap_options_toggler {
+    cursor: pointer;
+}
+
+#map_coord_y_wrap {
+    position: absolute !important;
+    z-index: 10;
+    color: #fff;
+    background-color: RGBA(0, 0, 0, 0.2);
+    text-align: center;
+    font-size: 11px;
+    width: 24px;
+    overflow: hidden;
+}
+
+#map_coord_x_wrap {
+    position: absolute;
+    z-index: 11;
+    color: #fff;
+    bottom: 0px;
+    background-color: RGBA(0, 0, 0, 0.2);
+    font-size: 11px;
+    height: 17px;
+    overflow: hidden;
+}
+
+#map_coord_y_wrap, #map_coord_x_wrap {
+    opacity: 0.65;
+}
+
+#map_coord_y div {
+    width: 24px;
+    text-align: center;
+}
+
+#map_go_home_boundary {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 0px;
+    z-index: 12;
+}
+
+#map_go_home {
+    position: relative;
+    width: 50px;
+    height: 50px;
+}
+
+#map_go_home_circle {
+    position: relative;
+    display: inline-block;
+    border-radius: 15px;
+    background: rgba(0,0,0,0.3);
+    height: 30px;
+    width: 30px;
+    top: -43px;
+    left: 10px;
+    cursor: pointer;
+}
+
+#map_go_home_text {
+    position: relative;
+    display: inline-block;
+    fontsize: 10px;
+    font-weight: 700;
+    text-align: center;
+    color: white;
+    top: 7px;
+    height: 15px;
+    width: 30px;
+}
+
+#map_go_home_pointer {
+    position: relative;
+    left: 0px;
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    background-image: url(graphic/map/pointer_home.png);
+    background-position: 40px 20px;
+    background-repeat: no-repeat;
+}
+
+#special_effects_container, .map_effects_container {
+    position: absolute;
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    left: 0px;
+    top: 0px;
+    z-index: 10;
+}
+
+.center_beacon {
+    position: relative;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    border: 3px solid rgba(255, 255, 77, 0.5);
+    border-radius: 100px;
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0.05);
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    width: 60px;
+    height: 60px;
+}
+
+.center_beacon.end {
+    transition: width 0.6s linear, height 0.6s linear;
+    width: 0px;
+    height: 0px;
+}
+
+.map_beacon_container {
+    position: absolute;
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    -webkit-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}

@@ -1,0 +1,6 @@
+# Local game save data (H2 file database) - not version controlled
+backend/data/
+
+# Legacy reference bundle (original TWLAN server, kept locally for reference only)
+TWLan-linux64/
+

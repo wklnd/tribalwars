@@ -1,0 +1,25 @@
+# For Coolify (or plain `docker compose up`): only `frontend` is meant to be reachable from outside the
+# Docker network - Coolify should expose/route only its port 80. `backend` has no `ports:` mapping at all,
+# so it is only reachable from `frontend` over the internal compose network, never directly from the host
+# or the internet (see CLAUDE.md hard rule 6 - whatever sits in front of this, Cloudflare Tunnel or
+# otherwise, is the user's own setup, not part of this compose file).
+services:
+  backend:
+    build:
+      context: ./backend
+    volumes:
+      # The H2 file DB - never delete or recreate this volume to "fix" something (CLAUDE.md hard rule 1).
+      - twlan_data:/data
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  twlan_data:

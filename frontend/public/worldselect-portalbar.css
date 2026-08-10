@@ -1,0 +1,749 @@
+            <!-- .pb-outer div,
+            .pb-outer span,
+            .pb-outer applet,
+            .pb-outer object,
+            .pb-outer iframe,
+            .pb-outer p,
+            .pb-outer blockquote,
+            .pb-outer pre,
+            .pb-outer a,
+            .pb-outer abbr,
+            .pb-outer acronym,
+            .pb-outer address,
+            .pb-outer big,
+            .pb-outer cite,
+            .pb-outer code,
+            .pb-outer del,
+            .pb-outer dfn,
+            .pb-outer em,
+            .pb-outer img,
+            .pb-outer ins,
+            .pb-outer kbd,
+            .pb-outer q,
+            .pb-outer s,
+            .pb-outer samp,
+            .pb-outer small,
+            .pb-outer strike,
+            .pb-outer strong,
+            .pb-outer sub,
+            .pb-outer sup,
+            .pb-outer tt,
+            .pb-outer var,
+            .pb-outer b,
+            .pb-outer u,
+            .pb-outer i,
+            .pb-outer center,
+            .pb-outer dl,
+            .pb-outer dt,
+            .pb-outer dd,
+            .pb-outer ol,
+            .pb-outer ul,
+            .pb-outer li,
+            .pb-outer fieldset,
+            .pb-outer form,
+            .pb-outer label,
+            .pb-outer legend,
+            .pb-outer table,
+            .pb-outer caption,
+            .pb-outer tbody,
+            .pb-outer tfoot,
+            .pb-outer thead,
+            .pb-outer tr,
+            .pb-outer th,
+            .pb-outer td,
+            .pb-outer article,
+            .pb-outer aside,
+            .pb-outer canvas,
+            .pb-outer details,
+            .pb-outer embed,
+            .pb-outer figure,
+            .pb-outer figcaption,
+            .pb-outer footer,
+            .pb-outer header,
+            .pb-outer hgroup,
+            .pb-outer menu,
+            .pb-outer nav,
+            .pb-outer output,
+            .pb-outer ruby,
+            .pb-outer section,
+            .pb-outer summary,
+            .pb-outer time,
+            .pb-outer mark,
+            .pb-outer audio,
+            .pb-outer video {
+                margin: 0;
+                padding: 0;
+                border: 0;
+                font-size: 100%;
+                font: inherit;
+                vertical-align: baseline
+            }
+            .pb-outer ol,
+            .pb-outer ul {
+                list-style: none
+            }
+            .pb-outer blockquote,
+            .pb-outer q {
+                quotes: none
+            }
+            .pb-outer blockquote:before,
+            .pb-outer blockquote:after,
+            .pb-outer q:before,
+            .pb-outer q:after {
+                content: '';
+                content: none
+            }
+            .pb-outer table {
+                border-collapse: collapse;
+                border-spacing: 0
+            }
+            #pbar * {
+                box-sizing: content-box
+            }
+            #pbar {
+                position: static;
+                margin-left: auto;
+                margin-right: auto;
+                text-align: center;
+                top: 0;
+                width: 100%;
+                z-index: 999;
+                clear: both;
+                left: 0
+            }
+            .pb-outer {
+                background: #000 url(graphic/portal/staemme-bg-header-top.jpg) 0 0 repeat-x;
+                color: #fff;
+                height: 30px;
+                position: relative;
+                text-align: center;
+                top: 0;
+                left: 0;
+                z-index: 3000;
+                font: 12px/1.4em Helvetica, Tahoma, Arial, Sans-serif !important;
+                min-width: 984px
+            }
+            .pb-outer p {
+                font: 1em/1.4em Helvetica, Tahoma, Arial, Sans-serif
+            }
+            .pb-outer .pb-inner a:link {
+                color: #804000;
+                text-decoration: none
+            }
+            .pb-outer .pb-inner a:visited {
+                color: #ddd;
+                text-decoration: none
+            }
+            .pb-outer .pb-inner a:hover {
+                color: #fff;
+                text-decoration: none
+            }
+            .pb-outer .pb-inner {
+                margin: 0 auto;
+                height: 27px;
+                width: 1050px;
+                position: relative;
+                padding: 5px 0 0
+            }
+            .pb-outer .pb-inner .pb-cntnt .pb-home a {
+                background: url(graphic/portal/staemme-logo.png) no-repeat 0 0;
+                width: 180px;
+                height: 20px;
+                display: block;
+                float: left;
+                margin: 2px 0 0 20px
+            }
+            .pb-outer .pb-inner .pb-home a span {
+                display: none
+            }
+            .pb-outer .pb-inner .pb-cntnt {
+                float: left;
+                width: 100%
+            }
+            .pb-outer .pb-inner .pb-cntnt .pb-moregames-sec .pb-moregames-overview-lists,
+            .pb-outer .pb-inner .pb-cntnt .pb-mygames-sec .pb-mygames-and-moregames-overview-lists {
+                color: #fff
+            }
+            .pb-outer .clear {
+                display: table;
+                width: 100%
+            }
+            .pb-tab {
+                background: url(graphic/portal/staemme-bg-header-bottom.jpg) 0 0 repeat-x transparent;
+                height: 4px;
+                top: 0;
+                position: relative
+            }
+            .pb-outer .pb-inner .pb-lang-sec,
+            .pb-outer .pb-inner .pb-cntnt .pb-moregames-sec,
+            .pb-outer .pb-inner .pb-cntnt .pb-mygames-sec,
+            .pb-outer .pb-inner .pb-cntnt .pb-sec-news,
+            .pb-outer .pb-inner .pb-sec-error {
+                position: relative;
+                text-align: left;
+                zoom: 1
+            }
+            .pb-outer .pb-inner .pb-lang-sec .pb-lang-select {
+                float: left;
+                margin: 0 0 0 20px;
+                background: url(graphic/portal/staemme-sprite_02.png) no-repeat -319px -855px;
+                width: 51px;
+                height: 22px;
+                position: relative;
+                cursor: pointer
+            }
+            .pb-outer .pb-inner .pb-lang-sec .pb-lang-select .pb-lang-button {
+                background: url(graphic/portal/staemme-sprite_02.png) -320px -654px;
+                width: 15px;
+                height: 16px;
+                position: relative;
+                left: 32px;
+                top: -8px;
+                cursor: pointer
+            }
+            .pb-outer .pb-inner .pb-lang-sec .pb-lang-select:hover .pb-lang-button {
+                background-position: -320px -588px
+            }
+            .pb-outer .pb-inner .pb-lang-sec .pb-lang-select:active .pb-lang-button {
+                background-position: -571px -588px
+            }
+            .pb-outer .pb-inner .pb-lang-sec .pb-lang-select .pb-lang-content {
+                width: 18px;
+                height: 12px;
+                position: relative;
+                top: 6px;
+                left: 6px;
+                background: url(graphic/portal/staemme-sprite_02.png) no-repeat 0 -657px
+            }
+            .pb-outer.pb-outer-ae .pb-inner .pb-lang-sec .pb-lang-select {
+                direction: ltr
+            }
+            .pb-outer .pb-inner .pb-lang-sec .pb-lang-sec-options ul {
+                height: auto;
+                overflow-x: hidden;
+                overflow-y: auto
+            }
+            .pb-outer .pb-inner .pb-lang-sec .pb-lang-sec-options {
+                display: none;
+                z-index: 1;
+                position: absolute;
+                clear: both;
+                left: 220px;
+                top: 22px;
+                width: auto;
+                border-width: 1px;
+                border-style: solid;
+                border-color: #ddc8a5 #d5b279 #cba971;
+                box-shadow: 0 3px 10px 2px rgba(0, 0, 0, 0.5);
+                -moz-box-shadow: 0 3px 10px 2px rgba(0, 0, 0, 0.5);
+                -webkit-box-shadow: 0 3px 10px 2px rgba(0, 0, 0, 0.5);
+                -webkit-border-radius: 3px;
+                -moz-border-radius: 3px;
+                border-radius: 3px;
+                background: #e1c291 url(graphic/portal/staemme-noise.jpg) repeat 0 0
+            }
+            .pb-outer .pb-inner .pb-lang-sec .pb-lang-sec-options ul li {
+                width: 100%;
+                height: 22px;
+                padding: 2px 0;
+                background: url(graphic/portal/staemme-separator-lang.gif) no-repeat center top
+            }
+            .pb-outer .pb-inner .pb-lang-sec .pb-lang-sec-options ul li:first-child {
+                background: none;
+                padding: 2px 0
+            }
+            .pb-outer .pb-inner .pb-lang-sec .pb-lang-sec-options ul li:first-child:hover {
+                box-shadow: -moz-box-shadow: inset 0 0 1px 0 rgba(0, 0, 0, 0.2);
+                -webkit-box-shadow: inset 0 0 1px 0 rgba(0, 0, 0, 0.2);
+                box-shadow: inset 0 0 1px 0 rgba(0, 0, 0, 0.2);
+                -o-box-shadow: inset 0 0 1px 0 rgba(0, 0, 0, 0.2);
+                -ms-box-shadow: inset 0 0 1px 0 rgba(0, 0, 0, 0.2)
+            }
+            .pb-outer .pb-inner .pb-lang-sec .pb-lang-sec-options ul li:hover {
+                background-color: #dcbe8e;
+                -moz-box-shadow: 0 -1px 3px 0 rgba(0, 0, 0, 0.1) inset;
+                -webkit-box-shadow: 0 -1px 3px 0 rgba(0, 0, 0, 0.1) inset;
+                box-shadow: 0 -1px 3px 0 rgba(0, 0, 0, 0.1) inset;
+                -o-box-shadow: 0 -1px 3px 0 rgba(0, 0, 0, 0.1) inset;
+                -ms-box-shadow: 0 -1px 3px 0 rgba(0, 0, 0, 0.1) inset
+            }
+            .pb-outer .pb-inner .pb-lang-sec .pb-lang-sec-options ul li a {
+                color: #7b0101;
+                padding: 4px 6px 0 4px;
+                display: block;
+                text-shadow: 0 -1px 1px rgba(255, 255, 255, 0.2)
+            }
+            .pb-outer .pb-inner .pb-lang-sec .pb-lang-sec-options ul li a span {
+                padding-left: 25px
+            }
+            .pb-outer .pb-inner .pb-moregames-sec .pb-moregames-select {
+                float: left;
+                margin: 0 0 0 20px;
+                background: url(graphic/portal/staemme-bg-select-left.png) no-repeat 0 0;
+                width: auto;
+                height: 22px;
+                position: relative;
+                cursor: pointer
+            }
+            .pb-outer .pb-inner .pb-moregames-sec .pb-moregames-select .pb-moregames-button {
+                background: url(graphic/portal/staemme-sprite_02.png) -320px -654px;
+                width: 15px;
+                height: 16px;
+                position: absolute;
+                right: 3px;
+                top: 3px
+            }
+            .pb-outer .pb-inner .pb-moregames-sec .pb-moregames-select:hover .pb-moregames-button {
+                background-position: -320px -588px
+            }
+            .pb-outer .pb-inner .pb-moregames-sec .pb-moregames-select:active .pb-moregames-button {
+                background-position: -571px -588px
+            }
+            .pb-outer .pb-inner .pb-moregames-sec .pb-moregames-select .pb-moregames-content {
+                width: auto;
+                height: 22px;
+                position: relative;
+                top: 0;
+                right: 0;
+                margin-left: 11px;
+                background: url(graphic/portal/staemme-bg-select-right.png) no-repeat 100% 0
+            }
+            .pb-outer .pb-inner .pb-moregames-sec .pb-moregames-select .pb-moregames-content span {
+                position: relative;
+                display: inline-block;
+                top: 4px;
+                left: -4px;
+                font-size: .95em;
+                padding-right: 20px;
+                text-shadow: 0 -1px 1px #000
+            }
+            .pb-outer .pb-inner .pb-moregames-sec .pb-moregames-overview-lists {
+                display: none;
+                clear: both;
+                position: absolute;
+                left: 290px;
+                top: 22px;
+                width: 580px;
+                border-width: 1px;
+                border-style: solid;
+                border-color: #62625a #5e5c5c #817f7f;
+                background: #e1c291 url(graphic/portal/staemme-noise.jpg) repeat 0 0;
+                box-shadow: 0 3px 10px 2px rgba(0, 0, 0, 0.5), 0 0 10px 2px rgba(0, 0, 0, 0.5) inset;
+                -moz-box-shadow: 0 3px 10px 2px rgba(0, 0, 0, 0.5), 0 0 10px 2px rgba(0, 0, 0, 0.5) inset;
+                -webkit-box-shadow: 0 3px 10px 2px rgba(0, 0, 0, 0.5), 0 0 10px 2px rgba(0, 0, 0, 0.5) inset;
+                -webkit-border-radius: 3px;
+                -moz-border-radius: 3px;
+                border-radius: 3px
+            }
+            .pb-outer .pb-inner .pb-moregames-sec .pb-moregames-overview-lists > p {
+                color: #fff;
+                font: bold 1.05em/1em Helvetica, Tahoma, Arial, Sans-serif;
+                background: url(graphic/portal/staemme-bg-sec.jpg) repeat-x 0 0;
+                height: 19px;
+                border-right: 1px solid #393939;
+                border-left: 1px solid #393939;
+                padding: 6px 10px 0;
+                text-shadow: 1px 0 1px #222;
+                -moz-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.5);
+                -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.5);
+                box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.5);
+                -o-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.5);
+                -ms-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.5)
+            }
+            .pb-outer .pb-inner .pb-moregames-sec .pb-moregames-overview-lists .pb-moregames-overview {
+                padding: 0 0 0 10px;
+                width: 580px
+            }
+            .pb-outer.pb-outer-ae .pb-inner .pb-moregames-sec .pb-moregames-overview-lists .pb-moregames-overview {
+                padding: 0 10px 0 0
+            }
+            .pb-outer .pb-inner .pb-moregames-sec .pb-moregames-overview-lists .pb-moregames-overview li {
+                float: left;
+                margin: 10px 10px 10px 0;
+                position: relative;
+                overflow: hidden;
+                height: 106px
+            }
+            .pb-outer .pb-inner .pb-moregames-sec .pb-moregames-overview-lists .pb-moregames-overview li > a {
+                color: #fff
+            }
+            .pb-outer.pb-outer-ae .pb-inner .pb-moregames-sec .pb-moregames-overview-lists .pb-moregames-overview li {
+                margin: 10px 0 10px 10px;
+                float: right
+            }
+            .pb-outer .pb-inner .pb-moregames-sec .pb-moregames-overview-lists ul li .pb-caption {
+                position: absolute;
+                background: #000;
+                opacity: .8;
+                filter: progid: DXImageTransform.Microsoft.Alpha(Opacity=80);
+                -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+                width: 178px;
+                height: 106px;
+                left: 0;
+                top: 76px;
+                border-right: 1px solid #714A23;
+                border-left: 1px solid #714A23;
+                border-top: 1px solid #3c3c3c;
+                cursor: pointer
+            }
+            .pb-outer .pb-inner .pb-moregames-sec .pb-moregames-overview-lists ul li .feature {
+                width: 556px
+            }
+            .pb-outer .pb-inner .pb-moregames-sec .pb-moregames-overview-lists ul li .pb-caption .gamename {
+                color: #fff;
+                margin: 10px 0 10px 10px;
+                text-shadow: 0 1px 1px #000;
+                font: bold 1em/1.4em Helvetica, Tahoma, Arial, Sans-serif
+            }
+            .pb-outer .pb-inner .pb-moregames-sec .pb-moregames-overview-lists ul li .pb-caption p {
+                margin-left: 10px;
+                font-size: 10px;
+                text-shadow: 0 0 1px #000;
+                font-weight: bold
+            }
+            .pb-outer .pb-inner .pb-moregames-sec .pb-moregames-overview-lists ul .pb_game_thumb_featured .pb-ribbon-beta {
+                background: url(graphic/portal/moregames-teaser-featured-beta-ribbon.png) no-repeat 0 0;
+                position: absolute;
+                top: -2px;
+                right: -1px;
+                width: 76px;
+                height: 54px;
+                z-index: 1
+            }
+            .pb-outer .pb-inner .pb-moregames-sec .pb-moregames-overview-lists ul .pb_game_thumb_featured .pb-ribbon-soon {
+                background: url(graphic/portal/moregames-teaser-featured-soon-ribbon.png) no-repeat 0 0;
+                position: absolute;
+                top: -2px;
+                right: -1px;
+                width: 76px;
+                height: 54px;
+                z-index: 1
+            }
+            .pb-outer .pb-inner .pb-moregames-sec .pb-moregames-overview-lists ul .pb_game_thumb_featured .pb-ribbon-new {
+                background: url(graphic/portal/moregames-teaser-featured-new-ribbon.png) no-repeat 0 0;
+                position: absolute;
+                top: -2px;
+                right: -1px;
+                width: 76px;
+                height: 54px;
+                z-index: 1
+            }
+            .pb-outer .pb-inner .pb-moregames-sec .pb-moregames-overview-lists ul li .pb-ribbon-beta {
+                background: url(graphic/portal/moregames-teaser-beta-ribbon.png) no-repeat 0 0;
+                position: absolute;
+                top: -2px;
+                right: -1px;
+                width: 38px;
+                height: 37px;
+                z-index: 1
+            }
+            .pb-outer .pb-inner .pb-moregames-sec .pb-moregames-overview-lists ul li div.pb-ribbon-soon {
+                background: url(graphic/portal/moregames-teaser-soon-ribbon.png) no-repeat 0 0;
+                position: absolute;
+                top: -2px;
+                right: -1px;
+                width: 38px;
+                height: 37px;
+                z-index: 1
+            }
+            .pb-outer .pb-inner .pb-moregames-sec .pb-moregames-overview-lists ul li div.pb-ribbon-new {
+                background: url(graphic/portal/moregames-teaser-new-ribbon.png) no-repeat 0 0;
+                position: absolute;
+                top: -2px;
+                right: -1px;
+                width: 38px;
+                height: 37px;
+                z-index: 1
+            }
+            .pb-outer .pb-inner .pb-sec-news .pb-news {
+                display: none;
+                float: left;
+                margin: 0 0 0 20px;
+                background: url(graphic/portal/staemme-sprite_02.png) no-repeat 0 -428px;
+                width: 302px;
+                height: 23px;
+                position: relative
+            }
+            .pb-outer .pb-inner .pb-sec-news .pb-news .pb-news-content {
+                width: 288px;
+                height: 16px;
+                position: relative;
+                top: 4px;
+                left: 6px;
+                overflow: hidden
+            }
+            .pb-outer .pb-inner .pb-sec-news .pb-news .pb-news-content ul li a {
+                color: #333;
+                margin-right: 5px
+            }
+            .pb-outer .pb-inner .pb-sec-error .pb-sec-error-button {
+                float: left;
+                margin: 0 0 0 11px;
+                background: url(graphic/portal/error-message-lft.png) no-repeat 0 0;
+                height: 19px;
+                position: relative
+            }
+            .pb-outer .pb-inner .pb-sec-error .pb-sec-error-button div {
+                float: left;
+                background: url(graphic/portal/error-message-mid.png) repeat-x 0 0;
+                margin: 0 0 0 10px;
+                font-size: .9em;
+                padding-top: 3px
+            }
+            .pb-outer .pb-inner .pb-sec-error .pb-sec-error-button div span.pb-sec-error-bullet {
+                display: block;
+                padding: 0 5px 0 0;
+                background: url(graphic/portal/staemme-sprite_02.png) no-repeat -320px -988px;
+                width: 13px;
+                height: 16px;
+                position: relative;
+                top: -3px
+            }
+            .pb-outer .pb-inner .pb-sec-error .pb-sec-error-button span {
+                float: left;
+                display: block;
+                height: 19px;
+                background: url(graphic/portal/error-message-rt.png) no-repeat top right;
+                padding: 0 10px 0 0
+            }
+            .pb-outer .pb-inner .pb-flag {
+                background: url('graphic/portal/staemme-sprite_02.png') no-repeat top left;
+                height: 12px
+            }
+            .pb-outer .pb-inner #pb-flag-de {
+                background-position: 0 -1105px
+            }
+            .pb-outer .pb-inner #pb-flag-en {
+                background-position: 0 -721px
+            }
+            .pb-outer .pb-inner #pb-flag-fr {
+                background-position: 0 -1361px
+            }
+            .pb-outer .pb-inner #pb-flag-es {
+                background-position: 0 -1393px
+            }
+            .pb-outer .pb-inner #pb-flag-it {
+                background-position: 0 -1297px
+            }
+            .pb-outer .pb-inner #pb-flag-gr {
+                background-position: 0 -753px
+            }
+            .pb-outer .pb-inner #pb-flag-nl {
+                background-position: 0 -689px
+            }
+            .pb-outer .pb-inner #pb-flag-ro {
+                background-position: 0 -977px
+            }
+            .pb-outer .pb-inner #pb-flag-se {
+                background-position: 0 -1041px
+            }
+            .pb-outer .pb-inner #pb-flag-cz {
+                background-position: 0 -785px
+            }
+            .pb-outer .pb-inner #pb-flag-pl {
+                background-position: 0 -1201px
+            }
+            .pb-outer .pb-inner #pb-flag-hu {
+                background-position: 0 -1137px
+            }
+            .pb-outer .pb-inner #pb-flag-sk {
+                background-position: 0 -817px
+            }
+            .pb-outer .pb-inner #pb-flag-dk {
+                background-position: 0 -1233px
+            }
+            .pb-outer .pb-inner #pb-flag-no {
+                background-position: 0 -1169px
+            }
+            .pb-outer .pb-inner #pb-flag-pt {
+                background-position: 0 -849px
+            }
+            .pb-outer .pb-inner #pb-flag-jp {
+                background-position: 0 -1713px
+            }
+            .pb-outer .pb-inner #pb-flag-ru {
+                background-position: 0 -913px
+            }
+            .pb-outer .pb-inner #pb-flag-br {
+                background-position: 0 -1009px
+            }
+            .pb-outer .pb-inner #pb-flag-tr {
+                background-position: 0 -1329px
+            }
+            .pb-outer .pb-inner #pb-flag-ch {
+                background-position: 0 -1073px
+            }
+            .pb-outer .pb-inner #pb-flag-kr {
+                background-position: 0 -881px
+            }
+            .pb-outer .pb-inner #pb-flag-ae {
+                background-position: 0 -1457px
+            }
+            .pb-outer .pb-inner #pb-flag-bg {
+                background-position: 0 -657px
+            }
+            .pb-outer .pb-inner #pb-flag-th {
+                background-position: 0 -1745px
+            }
+            .pb-outer .pb-inner #pb-flag-ba {
+                background-position: 0 -1265px
+            }
+            .pb-outer .pb-inner #pb-flag-fi {
+                background-position: 0 -1425px
+            }
+            .pb-outer .pb-inner #pb-flag-hr {
+                background-position: 0 -1649px
+            }
+            .pb-outer .pb-inner #pb-flag-il {
+                background-position: 0 -1585px
+            }
+            .pb-outer .pb-inner #pb-flag-lt {
+                background-position: 0 -1553px
+            }
+            .pb-outer .pb-inner #pb-flag-si {
+                background-position: 0 -1521px
+            }
+            .pb-outer .pb-inner #pb-flag-us {
+                background-position: 0 -1777px
+            }
+            .pb-outer .pb-inner #pb-flag-id {
+                background-position: 0 -1617px
+            }
+            .pb-outer .pb-inner #pb-flag-uk {
+                background-position: 0 -1489px
+            }
+            .pb-outer .pb-inner #pb-flag-ts {
+                background-position: 0 -1681px
+            }
+            .pb-outer .pb-inner #pb-flag-zz,
+            .pb-outer .pb-inner #pb-flag-xx {
+                background-position: 0 -1809px
+            }
+            .pb-outer .pb-inner #pb-flag-ar {
+                background-position: 0 -1874px
+            }
+            .pb-outer .pb-inner #pb-flag-mx {
+                background-position: 0 -1841px
+            }
+            #pb-ticker-wrapper.has-js {
+                display: block
+            }
+            #pb-ticker {
+                width: 308px;
+                height: 20px;
+                display: block;
+                position: relative;
+                overflow: hidden;
+                left: -20px
+            }
+            #pb-ticker-title {
+                padding-top: 9px;
+                color: #990000;
+                font-weight: bold;
+                text-transform: uppercase;
+                display: none
+            }
+            #pb-ticker-content {
+                margin: 0;
+                position: absolute;
+                color: #333;
+                overflow: hidden;
+                white-space: nowrap
+            }
+            #pb-ticker-content a {
+                text-decoration: none;
+                color: #fff;
+                font-size: .95em;
+                text-shadow: 0 1px 1px #000
+            }
+            #pb-ticker-content a:hover {
+                text-decoration: underline;
+                color: #f1f1f1
+            }
+            #pb-ticker-content a span {
+                text-shadow: none
+            }
+            #pb-ticker-content a em {
+                font-style: italic
+            }
+            #pb-ticker-content a strong {
+                font-weight: bold
+            }
+            #pb-ticker-swipe {
+                padding-top: 9px;
+                position: absolute;
+                top: 0;
+                display: block;
+                width: 800px;
+                height: 23px
+            }
+            #pb-ticker-swipe span {
+                margin-left: 1px;
+                border-bottom: 1px solid #1F527B;
+                height: 12px;
+                width: 7px;
+                display: block
+            }
+            .js-hidden {
+                display: none
+            }
+            #no-js-news {
+                padding: 10px 0 0 45px;
+                color: #F8F0DB
+            }
+            .left #pb-ticker-swipe {
+                left: 80px
+            }
+            .left #pb-ticker-controls,
+            .left #pb-ticker-content,
+            .left #pb-ticker-title,
+            .left #pb-ticker {
+                float: left
+            }
+            .left #pb-ticker-controls {
+                padding-left: 6px
+            }
+            .right #pb-ticker-swipe {
+                right: 80px
+            }
+            .right #pb-ticker-controls,
+            .right #pb-ticker-content,
+            .right #pb-ticker-title,
+            .right #pb-ticker {
+                float: right
+            }
+            .right #pb-ticker-controls {
+                padding-right: 6px
+            }
+            *+html .pb-outer .pb-inner .pb-cntnt,
+            *+html .pb-outer .pb-inner,
+            *+html .pb-outer .pb-inner .pb-moregames-sec .pb-moregames-select .pb-moregames-content span,
+            *+html .pb-outer .pb-inner .pb-moregames-sec,
+            *+html .pb-outer .pb-inner .pb-lang-sec,
+            *+html .pb-outer .pb-inner .pb-cntnt .pb-moregames-sec,
+            *+html .pb-outer .pb-inner .pb-cntnt .pb-mygames-sec,
+            *+html .pb-outer .pb-inner .pb-cntnt .pb-sec-news,
+            *+html .pb-outer .pb-inner .pb-connect-button,
+            *+html .pb-outer .pb-inner .pb-sec-error,
+            *+html .pb-outer .pb-inner .pb-cntnt {
+                zoom: 1
+            }
+            *+html .pb-outer .pb-inner .pb-moregames-sec,
+            *+html .pb-outer .pb-inner .pb-lang-sec {
+                float: left;
+                position: static !important
+            }
+            *+html .pb-outer .pb-inner {
+                clear: both
+            }
+            *+html .pb-outer .pb-inner .pb-sec-news .pb-news .pb-news-content span {
+                top: 0
+            }
+            *+html .pb-outer .pb-inner .pb-moregames-sec .pb-moregames-overview-lists .pb-moregames-overview {
+                margin-bottom: 10px
+            }
+            *+html .pb-outer .pb-inner .pb-lang-sec .pb-lang-sec-options ul li {
+                display: block;
+                min-width: 140px
+            }
+            -->
