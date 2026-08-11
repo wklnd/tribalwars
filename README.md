@@ -1,9 +1,7 @@
 # TWLAN2
 
 A local, singleplayer reimplementation of Tribal Wars, built from scratch in Java and React.
-Not affiliated with or published by InnoGames. The original `TWLan-linux64` game bundle is kept
-locally (gitignored, never committed) purely as a reference for how the real game looks and plays —
-this repo doesn't reuse its code, just its visual fidelity as a target.
+Not affiliated with or published by InnoGames. 
 
 ## What this is
 
