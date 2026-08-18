@@ -59,6 +59,16 @@ export const MapSector = memo(function MapSector({ sx, sy, vmap }) {
             }}
           />
         );
+        if (v.bonus) {
+          // a bonus village: its bonus icon (the same sprite as in the overviews) in the tile's bottom-left corner
+          tiles.push(
+            <span
+              key={`b${tx}_${ty}`}
+              className={`bonus_icon bonus_icon_${v.bonus}`}
+              style={{ position: "absolute", zIndex: 4, marginLeft: 0, left: left + 3, top: top + TILE[1] - 20, pointerEvents: "none", backgroundColor: "rgba(244,228,188,0.85)", borderRadius: 3, boxShadow: "0 0 2px rgba(0,0,0,0.6)" }}
+            />
+          );
+        }
       } else {
         tiles.push(
           <img key={`t${tx}_${ty}`} src={GFX + terrainSprite(x, y)} style={{ position: "absolute", zIndex: 2, left, top }} />
