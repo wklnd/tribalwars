@@ -44,7 +44,7 @@ export function ProfileScreen({ name, go }) {
                   <tr>
                     <th colSpan="2">Player</th>
                   </tr>
-                  <tr><td width="110">Name:</td><td>{p.name}{p.npc ? " (AI player)" : ""}</td></tr>
+                  <tr><td width="110">Name:</td><td>{p.name}</td></tr>
                   <tr><td>Rank:</td><td>{p.rank} of {p.players}</td></tr>
                   <tr><td>Points:</td><td>{fmt(p.points)}</td></tr>
                   <tr>
