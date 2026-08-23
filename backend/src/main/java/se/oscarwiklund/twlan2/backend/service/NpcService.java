@@ -10,6 +10,7 @@ import se.oscarwiklund.twlan2.backend.service.npc.NpcEconomy;
 import se.oscarwiklund.twlan2.backend.service.npc.NpcLogService;
 import se.oscarwiklund.twlan2.backend.service.npc.NpcMilitary;
 import se.oscarwiklund.twlan2.backend.service.npc.NpcProfiles;
+import se.oscarwiklund.twlan2.backend.service.npc.NpcRetirement;
 import se.oscarwiklund.twlan2.backend.service.npc.NpcRhythm;
 import se.oscarwiklund.twlan2.backend.service.npc.WorldView;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.time.Instant;
 
 // Small AI for NPC players. Every NPC has a stable personality (derived from its account id): how busy it is, whether it
 // favours economy or military, and which troops it likes. Each tick an NPC village may queue a weighted-random building
@@ -124,6 +126,7 @@ public class NpcService {
             if (overBudget) break;
             List<Village> mine = villagesOf.getOrDefault(npc.getId(), List.of());
             if (mine.isEmpty() || mine.get(0).getWorld() == null) continue;
+            if (NpcRetirement.isRetired(npc, mine.get(0).getWorld(), Instant.now())) continue; // stopped playing for good; AbandonmentService picks up its villages
             worldsWithNpc.putIfAbsent(mine.get(0).getWorld().getId(), mine.get(0).getWorld()); // (their defence is looked at even when they are offline)
             Personality me = personalities.computeIfAbsent(npc.getId(), id -> personality(npc));
             NpcRhythm.Mood mood = rhythm.check(npc.getId(), mine.get(0).getWorld(), me.activity(),
