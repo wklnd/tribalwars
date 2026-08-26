@@ -2,10 +2,13 @@ package se.oscarwiklund.twlan2.backend.service;
 
 import se.oscarwiklund.twlan2.backend.domain.*;
 import se.oscarwiklund.twlan2.backend.repo.*;
+import se.oscarwiklund.twlan2.backend.service.npc.NpcRetirement;
 import se.oscarwiklund.twlan2.backend.service.npc.NpcRhythm;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 
 // NPC players in tribes: the sociable ones found tribes with generated names, recruit unaffiliated NPCs, set relations to
@@ -48,6 +51,26 @@ public class NpcTribeService {
         return new Random(npc.getId() * 15485863L + 11).nextDouble();
     }
 
+    // A minority of NPCs (stable per account, independent of sociability) never join any tribe at all - not
+    // everyone plays that way. The rest are governed by sociability as before (how eagerly, not whether).
+    static boolean joinsTribes(Account npc) {
+        return new Random(npc.getId() * 4290908717L + 23).nextDouble() < 0.65;
+    }
+
+    // World-days (at speed 1) before NPC-led tribes may turn hostile toward one another - early game stays
+    // peaceful while everyone is still building up; real wars are a mid/late-game thing.
+    private static final double WAR_ELIGIBLE_DAYS = 6;
+
+    private static boolean warsAllowed(World world) {
+        double speed = world.getSpeed() <= 0 ? 1 : world.getSpeed();
+        double pace = Math.min(30, Math.max(1, Math.sqrt(speed))); // mirrors NpcRhythm.pace()
+        return Duration.between(world.getCreatedAt(), Instant.now()).toMillis() >= WAR_ELIGIBLE_DAYS * 86_400_000L / pace;
+    }
+
+    private static double distance(Village a, Village b) {
+        return Math.hypot(a.getX() - b.getX(), a.getY() - b.getY());
+    }
+
     @Transactional
     public void tick() {
         for (World world : worlds.findAll()) {
@@ -61,20 +84,27 @@ public class NpcTribeService {
     }
 
     private void tick(World world) {
-        // NPC accounts that live in this world
+        // NPC accounts that live in this world, and each one's home village (first found) for proximity checks
         // (one query for the world instead of one per NPC: with hundreds of NPCs that alone took seconds per tick)
         Set<Long> livesHere = new HashSet<>();
-        for (Village v : villages.findByWorld(world)) if (v.getOwner() != null) livesHere.add(v.getOwner().getId());
+        Map<Long, Village> homeVillageOf = new HashMap<>();
+        for (Village v : villages.findByWorld(world)) {
+            if (v.getOwner() == null) continue;
+            livesHere.add(v.getOwner().getId());
+            homeVillageOf.putIfAbsent(v.getOwner().getId(), v);
+        }
+        Instant now = Instant.now();
         List<Account> npcs = new ArrayList<>();
         for (Account a : accounts.findByNpc(true)) {
-            if (livesHere.contains(a.getId()) && rhythm.isAwake(a.getId(), world)) npcs.add(a); // (asleep: answers the invitation in the morning)
+            // (asleep: answers the invitation in the morning; retired: stopped playing for good, see NpcRetirement)
+            if (livesHere.contains(a.getId()) && rhythm.isAwake(a.getId(), world) && !NpcRetirement.isRetired(a, world, now)) npcs.add(a);
         }
         if (npcs.size() < 2) return;
         Map<Long, Tribe> tribeOf = tribes.tribeByAccount(world);
 
         answerInvitations(world, npcs, tribeOf);
         found(world, npcs, tribeOf);
-        recruit(world, npcs, tribeOf);
+        recruit(world, npcs, tribeOf, homeVillageOf);
         inviteRealPlayer(world, tribeOf);
         relations(world);
     }
@@ -90,6 +120,8 @@ public class NpcTribeService {
             for (TribeInvitation i : mine) {
                 if (tribeOf.containsKey(npc.getId())) {
                     tribes.reject(npc, world, i.getId());
+                } else if (!joinsTribes(npc)) {
+                    if (rnd.nextDouble() < 0.3) tribes.reject(npc, world, i.getId()); // never joins, but clears out stale invitations eventually
                 } else if (rnd.nextDouble() < 0.25 + 0.5 * sociability(npc)) {
                     tribes.accept(npc, world, i.getId());
                     tribeOf.put(npc.getId(), tribeRepository.findById(i.getTribeId()).orElse(null));
@@ -109,7 +141,7 @@ public class NpcTribeService {
         long existing = tribeRepository.findByWorldId(world.getId()).stream().filter(t -> tribesWithMembers.contains(t.getId())).count();
         if (existing >= wanted) return;
         List<Account> candidates = new ArrayList<>();
-        for (Account a : npcs) if (!tribeOf.containsKey(a.getId()) && sociability(a) > 0.45) candidates.add(a);
+        for (Account a : npcs) if (!tribeOf.containsKey(a.getId()) && joinsTribes(a) && sociability(a) > 0.45) candidates.add(a);
         if (candidates.isEmpty()) return;
         Account founder = candidates.get(rnd.nextInt(candidates.size()));
         for (int attempt = 0; attempt < 12; attempt++) {
@@ -125,8 +157,9 @@ public class NpcTribeService {
         }
     }
 
-    // NPC tribes below their target size invite unaffiliated NPCs, who answer on a later tick.
-    private void recruit(World world, List<Account> npcs, Map<Long, Tribe> tribeOf) {
+    // NPC tribes below their target size invite unaffiliated NPCs, who answer on a later tick. Prefers
+    // geographically close NPCs over the whole map so tribes end up clustered in a region, like real alliances.
+    private void recruit(World world, List<Account> npcs, Map<Long, Tribe> tribeOf, Map<Long, Village> homeVillageOf) {
         Map<Long, List<TribeMember>> byTribe = new HashMap<>();
         for (TribeMember m : members.findByWorldId(world.getId())) byTribe.computeIfAbsent(m.getTribeId(), k -> new ArrayList<>()).add(m);
         Map<Long, Account> byId = new HashMap<>();
@@ -138,9 +171,20 @@ public class NpcTribeService {
             int target = Math.min(tribes.memberLimit(world), 3 + (int) (sociability(leader) * 9));
             if (e.getValue().size() >= target || rnd.nextDouble() > 0.15) continue;
             List<Account> free = new ArrayList<>();
-            for (Account a : npcs) if (!tribeOf.containsKey(a.getId())) free.add(a);
+            for (Account a : npcs) if (!tribeOf.containsKey(a.getId()) && joinsTribes(a)) free.add(a);
             if (free.isEmpty()) continue;
-            Account pick = free.get(rnd.nextInt(free.size()));
+            Village near = homeVillageOf.get(leader.getId());
+            Account pick;
+            if (near == null) {
+                pick = free.get(rnd.nextInt(free.size()));
+            } else {
+                free.sort(Comparator.comparingDouble(a -> {
+                    Village v = homeVillageOf.get(a.getId());
+                    return v == null ? Double.MAX_VALUE : distance(near, v);
+                }));
+                int pool = Math.min(free.size(), 6); // pick among the closest few, not always the single nearest
+                pick = free.get(rnd.nextInt(pool));
+            }
             try {
                 tribes.invite(leader, world, pick.getUsername());
             } catch (TribeService.TribeException alreadyInvited) {
@@ -191,7 +235,9 @@ public class NpcTribeService {
             if (rnd.nextDouble() < 0.1) tribes.endRelation(leader, world, b.getId());
             return;
         }
+        boolean warsOk = warsAllowed(world);
         double roll = rnd.nextDouble();
-        tribes.addRelation(leader, world, b.getTag(), roll < 0.4 ? "NAP" : roll < 0.7 ? "PARTNER" : "ENEMY");
+        String kind = warsOk ? (roll < 0.4 ? "NAP" : roll < 0.7 ? "PARTNER" : "ENEMY") : (roll < 0.57 ? "NAP" : "PARTNER"); // early game stays peaceful
+        tribes.addRelation(leader, world, b.getTag(), kind);
     }
 }
