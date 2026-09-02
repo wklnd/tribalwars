@@ -46,6 +46,10 @@ public class Village {
     // BonusType.code of the bonus this village carries; null = none. It stays when the village changes hands.
     private Integer bonusCode;
 
+    // A rune village for the Rune victory condition; null/false = ordinary village. Like bonusCode, it stays
+    // when the village changes hands - that's precisely when it should start scoring for the new owner's tribe.
+    private Boolean isRune;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -87,4 +91,7 @@ public class Village {
 
     public Integer getBonusCode() { return bonusCode; }
     public void setBonusCode(Integer bonusCode) { this.bonusCode = bonusCode; }
+
+    public boolean isRune() { return Boolean.TRUE.equals(isRune); }
+    public void setRune(Boolean isRune) { this.isRune = isRune; }
 }
