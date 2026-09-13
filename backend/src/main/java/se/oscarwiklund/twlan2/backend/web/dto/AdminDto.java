@@ -20,8 +20,9 @@ public final class AdminDto {
     public record Catalog(List<BuildingInfo> buildings, List<UnitInfo> units, List<se.oscarwiklund.twlan2.backend.service.WorldSettings.Setting> settings) {}
 
     public record WorldRow(Long id, String name, double speed, Instant createdAt, long players, long npcs, long villages,
-                        long barbarians, Map<String, String> settings) {}
-    public record WorldRequest(String name, Double speed, Map<String, String> settings) {}
+                        long barbarians, Map<String, String> settings, String victoryType, Map<String, String> victoryParams,
+                        Long victoryWonTribeId, String victoryWonTribeName, Instant victoryWonAt) {}
+    public record WorldRequest(String name, Double speed, Map<String, String> settings, String victoryType, Map<String, String> victoryParams) {}
 
     public record Player(Long accountId, String name, boolean npc, boolean admin, int villages, int points, List<Long> villageIds) {}
     public record RemovePlayerRequest(String villageHandling, String transferTo) {}
@@ -34,7 +35,7 @@ public final class AdminDto {
     public record VillageRow(Long id, String name, int x, int y, String ownerType, String ownerName, boolean npc) {}
 
     public record BarbarianRequest(int amount, Map<String, Integer> buildings, Map<String, Integer> units,
-                                   Map<String, Double> resources, Integer spread) {}
+                                   Map<String, Double> resources, Integer spread, Boolean rune) {}
     public record BarbarianResult(List<Long> created) {}
 
     public record RandomBarbarianRequest(int amount, Integer minDevelopment, Integer maxDevelopment, Integer spread) {}
@@ -47,10 +48,11 @@ public final class AdminDto {
     public record QueuedTraining(String type, int count) {}
     public record VillageDetail(Long id, String name, int x, int y, Long worldId, String worldName, String ownerType,
                                 String ownerName, double wood, double clay, double iron, Map<String, Integer> buildings,
-                                Map<String, Integer> units, List<QueuedBuild> buildQueue, List<QueuedTraining> trainQueue, Integer bonus) {}
-    // bonus is a BonusType code; 0 removes the bonus, null leaves it as it is.
+                                Map<String, Integer> units, List<QueuedBuild> buildQueue, List<QueuedTraining> trainQueue,
+                                Integer bonus, boolean rune) {}
+    // bonus is a BonusType code; 0 removes the bonus, null leaves it as it is. rune: null leaves it as it is.
     public record VillageUpdate(String name, Double wood, Double clay, Double iron, Map<String, Integer> buildings,
-                                Map<String, Integer> units, Integer bonus) {}
+                                Map<String, Integer> units, Integer bonus, Boolean rune) {}
     public record FinishResult(int finishedBuilds, int finishedTrainings) {}
 
     public record WorldMembership(Long worldId, String worldName, int villages) {}

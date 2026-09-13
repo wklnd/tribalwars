@@ -2,6 +2,8 @@ package se.oscarwiklund.twlan2.backend.service;
 
 import se.oscarwiklund.twlan2.backend.domain.*;
 import se.oscarwiklund.twlan2.backend.repo.*;
+import se.oscarwiklund.twlan2.backend.service.victory.RuneParams;
+import se.oscarwiklund.twlan2.backend.service.victory.RuneVillage;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,16 +35,19 @@ public class WorldService implements CommandLineRunner {
     private final UnitStockRepository unitStockRepository;
     private final CombatReportRepository combatReportRepository;
     private final AccountRepository accountRepository;
+    private final VictoryService victoryService;
 
     public WorldService(WorldRepository worldRepository, VillageRepository villageRepository,
                          BuildingRepository buildingRepository, UnitStockRepository unitStockRepository,
-                         CombatReportRepository combatReportRepository, AccountRepository accountRepository) {
+                         CombatReportRepository combatReportRepository, AccountRepository accountRepository,
+                         VictoryService victoryService) {
         this.accountRepository = accountRepository;
         this.worldRepository = worldRepository;
         this.villageRepository = villageRepository;
         this.buildingRepository = buildingRepository;
         this.unitStockRepository = unitStockRepository;
         this.combatReportRepository = combatReportRepository;
+        this.victoryService = victoryService;
     }
 
     @Override
@@ -272,11 +277,23 @@ public class WorldService implements CommandLineRunner {
         barbarian.setX(near[0]);
         barbarian.setY(near[1]);
         barbarian.setBonusCode(BonusType.roll(rnd, world));
-        barbarian.setWood(400);
-        barbarian.setClay(400);
-        barbarian.setIron(400);
+        boolean rune = RuneVillage.roll(rnd, victoryService.runeParamsIfActive(world));
+        barbarian.setRune(rune);
         barbarian.setResourcesSettledAt(Instant.now());
-        villageRepository.save(barbarian);
+        if (rune) {
+            // Rune villages are deliberately high level, unlike the plain "welcome barbarian" below.
+            VillageGenerator.Layout layout = VillageGenerator.generate(rnd, RuneVillage.development(rnd));
+            barbarian.setWood(layout.wood());
+            barbarian.setClay(layout.clay());
+            barbarian.setIron(layout.iron());
+            villageRepository.save(barbarian);
+            layout.buildings().forEach((t, level) -> addBuilding(barbarian, t, level));
+        } else {
+            barbarian.setWood(400);
+            barbarian.setClay(400);
+            barbarian.setIron(400);
+            villageRepository.save(barbarian);
+        }
 
         // A freshly generated barbarian village has no troops. Barbarians only ever hold troops
         // when they came from an abandoned player village (AbandonmentService/AdminService.removePlayer

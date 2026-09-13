@@ -53,6 +53,7 @@ public class AdminService {
     private final NpcLogService npcLog;
     private final se.oscarwiklund.twlan2.backend.service.npc.NpcIntelService npcIntel;
     private final ResearchService research;
+    private final VictoryService victoryService;
 
     public AdminService(WorldRepository worlds, VillageRepository villages, AccountRepository accounts,
                         AuthSessionRepository sessions, BuildingRepository buildings, BuildQueueItemRepository buildQueue,
@@ -60,7 +61,8 @@ public class AdminService {
                         CombatReportRepository reports, WorldService worldService, VillageService villageService,
                         JdbcTemplate jdbc, AchievementService achievements, StatsService stats,
                         NobleService nobles, FarmService farm, ResearchService research, TribeService tribes, SupportService support, GroupService groups, MarketService market, MailService mail, NpcProfiles npcProfiles, NpcLogService npcLog,
-                        se.oscarwiklund.twlan2.backend.service.npc.NpcIntelService npcIntel) {
+                        se.oscarwiklund.twlan2.backend.service.npc.NpcIntelService npcIntel, VictoryService victoryService) {
+        this.victoryService = victoryService;
         this.npcIntel = npcIntel;
         this.npcProfiles = npcProfiles;
         this.npcLog = npcLog;
@@ -165,8 +167,12 @@ public class AdminService {
         long npcs = vs.stream().filter(v -> v.getOwnerType() == OwnerType.PLAYER && v.getOwner() != null && v.getOwner().isNpc())
                 .map(v -> v.getOwner().getId()).distinct().count();
         long barb = vs.stream().filter(v -> v.getOwnerType() == OwnerType.BARBARIAN).count();
+        WorldVictory wv = victoryService.getOrDefault(w);
+        VictoryService.Outcome outcome = victoryService.outcomeOf(w);
         return new AdminDto.WorldRow(w.getId(), w.getName(), w.getSpeed(), w.getCreatedAt(), players, npcs, vs.size(), barb,
-                WorldSettings.effective(w));
+                WorldSettings.effective(w), wv.getType().name(), victoryService.paramsAsMap(wv),
+                outcome == null ? null : outcome.wonTribeId(), outcome == null ? null : outcome.wonTribeName(),
+                outcome == null ? null : outcome.wonAt());
     }
 
     @Transactional
@@ -176,6 +182,7 @@ public class AdminService {
         World w = worldService.createWorld(req.name(), speed);
         WorldSettings.apply(w, req.settings());
         worlds.save(w);
+        if (req.victoryType() != null) victoryService.configure(w, VictoryType.valueOf(req.victoryType()), req.victoryParams());
         return worldDto(w);
     }
 
@@ -192,6 +199,7 @@ public class AdminService {
         }
         WorldSettings.apply(w, req.settings());
         worlds.save(w);
+        if (req.victoryType() != null) victoryService.configure(w, VictoryType.valueOf(req.victoryType()), req.victoryParams());
         return worldDto(w);
     }
 
@@ -385,6 +393,7 @@ public class AdminService {
             v.setX(x);
             v.setY(y);
             v.setBonusCode(BonusType.roll(rnd, w));
+            v.setRune(Boolean.TRUE.equals(req.rune()));
             v.setWood(res.getOrDefault("wood", 400.0));
             v.setClay(res.getOrDefault("clay", 400.0));
             v.setIron(res.getOrDefault("iron", 400.0));
@@ -410,6 +419,7 @@ public class AdminService {
 
         Set<String> taken = villages.findByWorld(w).stream().map(v -> v.getX() + "|" + v.getY()).collect(Collectors.toCollection(HashSet::new));
         Random rnd = new Random();
+        se.oscarwiklund.twlan2.backend.service.victory.RuneParams runeParams = victoryService.runeParamsIfActive(w);
         List<Long> created = new ArrayList<>();
         int lo = Integer.MAX_VALUE, hi = 0;
         long total = 0;
@@ -417,7 +427,9 @@ public class AdminService {
             int[] spot = spread == null ? WorldService.randomFreeSpot(taken, rnd) : WorldService.randomFreeSpot(taken, rnd, spread);
             int x = spot[0], y = spot[1];
 
-            double development = (min + (max - min) * rnd.nextDouble()) / 100.0;
+            boolean rune = se.oscarwiklund.twlan2.backend.service.victory.RuneVillage.roll(rnd, runeParams);
+            double development = rune ? se.oscarwiklund.twlan2.backend.service.victory.RuneVillage.development(rnd)
+                    : (min + (max - min) * rnd.nextDouble()) / 100.0;
             VillageGenerator.Layout layout = VillageGenerator.generate(rnd, development);
             Village v = new Village();
             v.setName("Abandoned Camp");
@@ -426,6 +438,7 @@ public class AdminService {
             v.setX(x);
             v.setY(y);
             v.setBonusCode(BonusType.roll(rnd, w));
+            v.setRune(rune);
             v.setWood(layout.wood());
             v.setClay(layout.clay());
             v.setIron(layout.iron());
@@ -475,6 +488,7 @@ public class AdminService {
             if (req.bonus() != 0 && BonusType.byCode(req.bonus()) == null) throw new IllegalArgumentException("Unknown bonus " + req.bonus());
             v.setBonusCode(req.bonus() == 0 ? null : req.bonus());
         }
+        if (req.rune() != null) v.setRune(req.rune());
         villages.save(v);
         if (req.buildings() != null) {
             for (var e : req.buildings().entrySet()) {
@@ -565,7 +579,7 @@ public class AdminService {
                 buildQueue.findByVillageOrderByPositionAsc(v).stream().map(q -> new QueuedBuild(q.getType().name(), q.getTargetLevel())).toList(),
                 trainQueue.findByVillageOrderByPositionAsc(v).stream()
                         .map(t -> new QueuedTraining(t.getType().name(), t.getTotalCount() - t.getProducedCount())).toList(),
-                v.getBonusCode());
+                v.getBonusCode(), v.isRune());
     }
 
     // ---- accounts ------------------------------------------------------------------------------------------
