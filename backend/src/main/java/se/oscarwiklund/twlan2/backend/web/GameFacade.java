@@ -14,6 +14,7 @@ import se.oscarwiklund.twlan2.backend.service.SupportService;
 import se.oscarwiklund.twlan2.backend.service.TrainService;
 import se.oscarwiklund.twlan2.backend.service.WorldSettings;
 import se.oscarwiklund.twlan2.backend.service.VillageService;
+import se.oscarwiklund.twlan2.backend.service.VictoryService;
 import se.oscarwiklund.twlan2.backend.web.dto.ReportDto;
 import se.oscarwiklund.twlan2.backend.web.dto.VillageStateDto;
 import se.oscarwiklund.twlan2.backend.web.dto.VillageStateDto.*;
@@ -46,6 +47,7 @@ public class GameFacade {
     private final ForumService forumService;
     private final MailService mailService;
     private final MarketService marketService;
+    private final VictoryService victoryService;
 
     public GameFacade(VillageRepository villageRepository, BuildingRepository buildingRepository,
                        BuildQueueItemRepository buildQueueItemRepository, UnitStockRepository unitStockRepository,
@@ -53,7 +55,8 @@ public class GameFacade {
                        CombatReportRepository combatReportRepository, VillageService villageService,
                        GameSettings settings, WorldRepository worldRepository, TrainService trainService,
                        PaladinProfileRepository paladinProfileRepository, NobleService nobleService,
-                       ResearchService researchService, SupportService supportService, ForumService forumService, MarketService marketService, MailService mailService) {
+                       ResearchService researchService, SupportService supportService, ForumService forumService, MarketService marketService, MailService mailService, VictoryService victoryService) {
+        this.victoryService = victoryService;
         this.marketService = marketService;
         this.forumService = forumService;
         this.mailService = mailService;
@@ -207,8 +210,16 @@ public class GameFacade {
                 village.getOwner() != null && village.getWorld() != null && forumService.hasUnread(village.getOwner(), village.getWorld()),
                 new MerchantsDto(marketService.totalMerchants(village), marketService.availableMerchants(village), MarketService.CAPACITY),
                 (int) mailService.unreadCount(village.getOwner(), village.getWorld()),
-                bonusCode(village)
+                bonusCode(village),
+                worldVictoryDto(village.getWorld())
         );
+    }
+
+    private WorldVictoryDto worldVictoryDto(World world) {
+        if (world == null) return null;
+        VictoryService.Outcome outcome = victoryService.outcomeOf(world);
+        return outcome == null ? null
+                : new WorldVictoryDto(outcome.type().name(), outcome.wonTribeId(), outcome.wonTribeName(), outcome.wonAt());
     }
 
     static Integer bonusCode(Village village) {

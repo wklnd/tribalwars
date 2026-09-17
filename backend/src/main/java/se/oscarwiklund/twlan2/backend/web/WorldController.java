@@ -4,6 +4,7 @@ import se.oscarwiklund.twlan2.backend.domain.World;
 import se.oscarwiklund.twlan2.backend.repo.WorldRepository;
 import se.oscarwiklund.twlan2.backend.service.WorldService;
 import se.oscarwiklund.twlan2.backend.service.WorldSettings;
+import se.oscarwiklund.twlan2.backend.service.VictoryService;
 import se.oscarwiklund.twlan2.backend.web.dto.CreateWorldRequest;
 import se.oscarwiklund.twlan2.backend.web.dto.WorldDto;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,10 +20,12 @@ public class WorldController {
 
     private final WorldRepository worldRepository;
     private final WorldService worldService;
+    private final VictoryService victoryService;
 
-    public WorldController(WorldRepository worldRepository, WorldService worldService) {
+    public WorldController(WorldRepository worldRepository, WorldService worldService, VictoryService victoryService) {
         this.worldRepository = worldRepository;
         this.worldService = worldService;
+        this.victoryService = victoryService;
     }
 
     @GetMapping("/api/worlds")
@@ -47,6 +50,7 @@ public class WorldController {
     private WorldDto toDto(World w) {
         var account = AccountContext.get();
         return new WorldDto(w.getId(), w.getName(), w.getSpeed(), w.getCreatedAt(),
-                account != null && worldService.hasVillage(w, account), WorldSettings.get(w, "description"));
+                account != null && worldService.hasVillage(w, account), WorldSettings.get(w, "description"),
+                victoryService.isClosed(w));
     }
 }

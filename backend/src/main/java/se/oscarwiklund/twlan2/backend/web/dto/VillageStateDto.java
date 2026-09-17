@@ -45,8 +45,11 @@ public record VillageStateDto(
         boolean newForumPost,
         MerchantsDto merchants,
         int newMails,
-        Integer bonus
+        Integer bonus,
+        WorldVictoryDto worldVictory
 ) {
+    public record WorldVictoryDto(String type, Long wonTribeId, String wonTribeName, Instant wonAt) {}
+
     // Troops of a tribe-mate stationed here (stationed, village = where they come from) or of this
     // village stationed elsewhere (supporting, village = where they are).
     public record ArmyDto(Long id, Long villageId, String villageName, int x, int y, String player, Map<String, Integer> units) {}

@@ -1,6 +1,7 @@
 package se.oscarwiklund.twlan2.backend.web;
 
 import se.oscarwiklund.twlan2.backend.service.AuthService;
+import se.oscarwiklund.twlan2.backend.service.VictoryService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Configuration;
@@ -15,9 +16,11 @@ import java.io.IOException;
 public class WebConfig implements WebMvcConfigurer {
 
     private final AuthService authService;
+    private final VictoryService victoryService;
 
-    public WebConfig(AuthService authService) {
+    public WebConfig(AuthService authService, VictoryService victoryService) {
         this.authService = authService;
+        this.victoryService = victoryService;
     }
 
     @Override
@@ -66,6 +69,12 @@ public class WebConfig implements WebMvcConfigurer {
                     response.getWriter().write("{\"error\":\"Admins only.\"}");
                     return false;
                 }
+                if (isClosedWorldMutation(request)) {
+                    response.setStatus(423); // Locked
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"error\":\"This world has ended.\"}");
+                    return false;
+                }
                 return true;
             }
 
@@ -76,6 +85,17 @@ public class WebConfig implements WebMvcConfigurer {
                 AccountContext.clear();
             }
         }).addPathPatterns("/api/**");
+    }
+
+    // A world that met its victory condition is read-only: reports/map/stats stay browsable (GET), but no
+    // further game action is accepted, for anyone (including its own admin routes are exempt so an admin can
+    // still manage it). Auth/account endpoints are exempt too - logging out of a closed world must still work.
+    private boolean isClosedWorldMutation(HttpServletRequest request) {
+        if ("GET".equals(request.getMethod())) return false;
+        String path = request.getRequestURI();
+        if (path.startsWith("/api/admin") || path.startsWith("/api/auth")) return false;
+        Long worldId = WorldContext.get();
+        return worldId != null && victoryService.isClosed(worldId);
     }
 
     // Register, login and the world list: the start page shows these before anyone is logged in.
