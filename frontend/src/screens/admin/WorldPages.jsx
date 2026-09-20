@@ -3,6 +3,7 @@ import { api } from "../../api";
 import { Btn, Card, Chip, ConfirmDialog, Empty, ErrorNote, Field, Icon, Loading, NavLink, Notice, PageHead, Stepper, DualRange, useToast } from "./kit.jsx";
 import { fmtDate, fmtInt, plural, toNum, useLoad } from "./util.jsx";
 import { SettingsGroups, initialValues } from "./SettingsForm.jsx";
+import { VictorySettings, VictoryBadge, defaultVictoryValue } from "./VictorySettings.jsx";
 
 const A = api.admin;
 
@@ -31,6 +32,7 @@ export function WorldSettings({ world, catalog, reloadWorlds, go }) {
   const [name, setName] = useState(world.name);
   const [speed, setSpeed] = useState(String(world.speed));
   const [values, setValues] = useState(() => initialValues(catalog, world));
+  const [victory, setVictory] = useState(() => defaultVictoryValue(world));
   const [error, setError] = useState(null);
   const [saving, setSaving] = useState(false);
   const [confirming, setConfirming] = useState(false);
@@ -60,7 +62,7 @@ export function WorldSettings({ world, catalog, reloadWorlds, go }) {
     if (sp === undefined || Number.isNaN(sp) || sp <= 0) return setError("Speed must be a positive number.");
     setSaving(true);
     try {
-      await A.updateWorld(world.id, { name: name.trim(), speed: sp, settings: values });
+      await A.updateWorld(world.id, { name: name.trim(), speed: sp, settings: values, victoryType: victory.type, victoryParams: victory.params });
       toast("Settings saved.");
       reloadWorlds();
     } catch (err) {
@@ -89,7 +91,7 @@ export function WorldSettings({ world, catalog, reloadWorlds, go }) {
   return (
     <form onSubmit={save} className="narrow">
       <PageHead
-        title={world.name}
+        title={<>{world.name} {world.victoryWonAt ? <Chip tone="muted">closed</Chip> : null} <VictoryBadge world={world} /></>}
         sub={`World #${world.id}, created ${fmtDate(world.createdAt)}`}
         actions={
           <>
@@ -116,6 +118,7 @@ export function WorldSettings({ world, catalog, reloadWorlds, go }) {
         </div>
       </Card>
       <SettingsGroups catalog={catalog} values={values} onChange={(k, v) => setValues((o) => ({ ...o, [k]: v }))} />
+      <VictorySettings value={victory} onChange={setVictory} />
       <div className="formbar">
         <Btn type="submit" variant="primary" icon="save" busy={saving}>Save settings</Btn>
       </div>

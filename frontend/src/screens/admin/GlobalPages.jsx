@@ -3,6 +3,7 @@ import { api } from "../../api";
 import { Btn, Card, Chip, ConfirmDialog, Empty, ErrorNote, Field, Loading, NavLink, Notice, PageHead, useToast } from "./kit.jsx";
 import { fmtBytes, fmtDate, fmtInt, fmtUptime, plural, toNum, useLoad } from "./util.jsx";
 import { SettingsGroups, initialValues } from "./SettingsForm.jsx";
+import { VictorySettings, defaultVictoryValue } from "./VictorySettings.jsx";
 
 const A = api.admin;
 
@@ -273,6 +274,7 @@ export function CreateWorld({ catalog, reloadWorlds, go }) {
   const [name, setName] = useState("");
   const [speed, setSpeed] = useState("1");
   const [values, setValues] = useState(() => initialValues(catalog));
+  const [victory, setVictory] = useState(() => defaultVictoryValue(null));
   const [error, setError] = useState(null);
   const [created, setCreated] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -286,7 +288,7 @@ export function CreateWorld({ catalog, reloadWorlds, go }) {
     if (sp === undefined || Number.isNaN(sp) || sp <= 0) return setError("Speed must be a positive number.");
     setBusy(true);
     try {
-      const w = await A.createWorld({ name: name.trim(), speed: sp, settings: values });
+      const w = await A.createWorld({ name: name.trim(), speed: sp, settings: values, victoryType: victory.type, victoryParams: victory.params });
       setCreated(w);
       toast(`World "${w.name}" created.`);
       setName("");
@@ -318,6 +320,7 @@ export function CreateWorld({ catalog, reloadWorlds, go }) {
         </div>
       </Card>
       <SettingsGroups catalog={catalog} values={values} onChange={(k, v) => setValues((o) => ({ ...o, [k]: v }))} />
+      <VictorySettings value={victory} onChange={setVictory} />
       <div className="formbar">
         <Btn type="submit" variant="primary" busy={busy} icon="plus">Create world</Btn>
       </div>
