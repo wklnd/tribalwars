@@ -23,6 +23,7 @@ export function WorldSwitch({ open, worlds, currentId, onClose, onSelect }) {
               }}
             >
               {w.name}
+              {w.closed ? " (closed)" : ""}
             </a>
           ))}
           <div style={{ clear: "both" }} />

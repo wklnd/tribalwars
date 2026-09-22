@@ -38,6 +38,8 @@ const REAL_BUILDING_SCREENS = new Set([
   "main", "wood", "stone", "iron", "storage", "hide", "wall", "statue", "snob", "stable", "garage", "smith", "barracks",
 ]);
 
+const VICTORY_LABELS = { DOMINATION: "Domination", WAR: "The war", RUNE: "The race for the rune villages" };
+
 export default function App() {
   const [village, setVillage] = useState(null);
   const [villages, setVillages] = useState([]);
@@ -477,6 +479,12 @@ export default function App() {
             <td className="maincell" style={{ width: 850 }}>
               <br className="newStyleOnly" />
               <hr className="oldStyleOnly" />
+              {village?.worldVictory && (
+                <div className="victory-banner">
+                  {VICTORY_LABELS[village.worldVictory.type] ?? "This world"} has been won by {village.worldVictory.wonTribeName ?? "a tribe"}.
+                  <span className="victory-sub">The world is closed; no further action is possible.</span>
+                </div>
+              )}
               <HeaderInfo village={village} go={go} now={now} fetchedAt={fetchedAt} onSwitchVillage={switchVillage} onSelectVillage={selectVillage} groups={villageGroups} />
               <table align="center" id="contentContainer" width="100%">
                 <tbody>
