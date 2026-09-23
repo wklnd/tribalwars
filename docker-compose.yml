@@ -1,8 +1,3 @@
-# For Coolify (or plain `docker compose up`): only `frontend` is meant to be reachable from outside the
-# Docker network, and only via loopback - a reverse proxy (Caddy + Cloudflare Tunnel on the deployment
-# host) forwards to 127.0.0.1:8092, never a bare 0.0.0.0 publish (CLAUDE.md hard rule 6). `backend` has no
-# `ports:` mapping at all, so it is only reachable from `frontend` over the internal compose network, never
-# directly from the host or the internet.
 services:
   backend:
     build:
