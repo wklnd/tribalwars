@@ -14,7 +14,9 @@ import java.util.*;
 
 // Tracks the achievements of AchievementCatalog: game events bump counters, dynamic values (points, ranks,
 // years played) are refreshed every half minute, and every level reached is recorded once as an AchievementUnlock.
-// Only real players earn achievements, never NPCs.
+// Real players always earn achievements; whether NPCs do too is the "npcAchievements" world setting
+// (off/levels/full - see WorldSettings): off is the classic default, levels lets them unlock/show up on the
+// achievement ranking without ever winning a daily "of the day" award, full lets them win those too.
 @Service
 public class AchievementService {
 
@@ -44,13 +46,22 @@ public class AchievementService {
 
     // ---- recording -----------------------------------------------------------------------------------------
 
-    private static boolean earns(Account a) {
-        return a != null && !a.isNpc();
+    private static boolean earns(Account a, World world) {
+        if (a == null) return false;
+        return !a.isNpc() || npcsEarn(world);
+    }
+
+    private static boolean npcsEarn(World world) {
+        return !"off".equals(WorldSettings.get(world, "npcAchievements"));
+    }
+
+    private static boolean npcsCompeteDaily(World world) {
+        return "full".equals(WorldSettings.get(world, "npcAchievements"));
     }
 
     @Transactional
     public void count(Account account, World world, String key, long amount) {
-        if (!earns(account) || world == null || amount == 0) return;
+        if (!earns(account, world) || world == null || amount == 0) return;
         bump(account, world, key, amount);
         evaluate(account, world);
     }
@@ -83,7 +94,7 @@ public class AchievementService {
     @Transactional
     public void onBattle(Account attacker, Account defenderOwner, World world, boolean attackerWon, long defenderUnitsBefore,
                          long defenderLosses, long loot, long noblesKilled) {
-        if (!earns(attacker) || world == null) return;
+        if (!earns(attacker, world) || world == null) return;
         if (defenderOwner != null && !defenderOwner.getId().equals(attacker.getId())) {
             markOnce(attacker, world, "target:" + defenderOwner.getId());
         }
@@ -105,14 +116,14 @@ public class AchievementService {
     // loyaltyAfter is where the loyalty ended (<= 0 = conquered).
     @Transactional
     public void onNobles(Account attacker, World world, double loyaltyAfter, boolean conquered) {
-        if (!earns(attacker) || world == null) return;
+        if (!earns(attacker, world) || world == null) return;
         if (conquered && loyaltyAfter == 0) bump(attacker, world, "lucky", 1); // brought down to exactly 0
         if (!conquered && loyaltyAfter > 0 && loyaltyAfter <= 1) bump(attacker, world, "unlucky", 1);
     }
 
     @Transactional
     public void onConquest(Account attacker, World world) {
-        if (!earns(attacker) || world == null) return;
+        if (!earns(attacker, world) || world == null) return;
         bump(attacker, world, "conquests", 1);
         DailyStat day = today(world, attacker);
         day.setConquests(day.getConquests() + 1);
@@ -164,7 +175,7 @@ public class AchievementService {
     // Backfills every level up to the one now reached, not just the top one.
     @Transactional
     public void evaluate(Account account, World world) {
-        if (!earns(account) || world == null) return;
+        if (!earns(account, world) || world == null) return;
         Map<String, Long> v = values(account, world);
         Set<String> have = new HashSet<>();
         for (AchievementUnlock u : unlocks.findByAccountIdAndWorldId(account.getId(), world.getId())) have.add(u.getAchievementKey() + "#" + u.getUnlockLevel());
@@ -218,7 +229,7 @@ public class AchievementService {
             continentPoints.computeIfAbsent(v.getOwner().getId(), k -> new HashMap<>()).merge(continent, p, Integer::sum);
         }
         for (Account a : owners.values()) {
-            if (!earns(a)) continue;
+            if (!earns(a, world)) continue;
             int mine = points.get(a.getId());
             long rank = 1 + points.values().stream().filter(p -> p > mine).count();
             // continent rank: among players with villages on the continent where the account has the most points
@@ -258,7 +269,10 @@ public class AchievementService {
     }
 
     private void award(World world, List<DailyStat> stats, java.util.function.ToLongFunction<DailyStat> stat, String counter) {
-        stats.stream().filter(s -> stat.applyAsLong(s) > 0).max(Comparator.comparingLong(stat)).ifPresent(best ->
+        boolean full = npcsCompeteDaily(world);
+        stats.stream().filter(s -> stat.applyAsLong(s) > 0)
+                .filter(s -> full || accounts.findById(s.getAccountId()).map(a -> !a.isNpc()).orElse(true))
+                .max(Comparator.comparingLong(stat)).ifPresent(best ->
                 accounts.findById(best.getAccountId()).ifPresent(a -> count(a, world, counter, 1)));
     }
 
