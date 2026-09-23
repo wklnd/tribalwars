@@ -29,6 +29,11 @@ public class TrainQueueItem {
 
     // true: this order removes units on completion (Decommissioning) instead of adding them. Shares the same
     // per-building queue/position numbering as ordinary recruiting, like the original's queue.php does.
+    // columnDefinition gives ddl-auto=update's ALTER TABLE a DEFAULT, required for H2 to add a NOT NULL column
+    // to the already-populated production table (a bare `not null` with no default made every ALTER TABLE fail
+    // silently at startup, so the column was never added and every query touching this entity 500'd - see the
+    // "Something went wrong loading the game" investigation).
+    @Column(columnDefinition = "boolean default false")
     private boolean decommission;
 
     public Long getId() { return id; }

@@ -552,7 +552,9 @@ export default function App() {
           </tr>
         </tbody>
       </table>
-      <AchievementToasts enabled go={go} />
+      <ErrorBoundary fallback={() => null}>
+        <AchievementToasts enabled go={go} />
+      </ErrorBoundary>
       <div id="footer">
         <div id="footer_logo" />
         <div id="linkContainer">
@@ -592,18 +594,22 @@ export default function App() {
           </div>
         </div>
       </div>
-      <WorldSwitch
-        open={worldOpen}
-        worlds={worlds ?? []}
-        currentId={worldId}
-        onClose={() => setWorldOpen(false)}
-        onSelect={chooseWorld}
-      />
-      {info && (
-        <div className={"autoHideBox" + (info.kind ? " " + info.kind : "")} onClick={() => setInfo(null)}>
-          <p>{info.message}</p>
-        </div>
-      )}
+      <ErrorBoundary fallback={() => null}>
+        <WorldSwitch
+          open={worldOpen}
+          worlds={worlds ?? []}
+          currentId={worldId}
+          onClose={() => setWorldOpen(false)}
+          onSelect={chooseWorld}
+        />
+      </ErrorBoundary>
+      <ErrorBoundary fallback={() => null}>
+        {info && (
+          <div className={"autoHideBox" + (info.kind ? " " + info.kind : "")} onClick={() => setInfo(null)}>
+            <p>{info.message}</p>
+          </div>
+        )}
+      </ErrorBoundary>
     </>
   );
 }

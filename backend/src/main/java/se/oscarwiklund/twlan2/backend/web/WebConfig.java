@@ -103,6 +103,7 @@ public class WebConfig implements WebMvcConfigurer {
         String path = request.getRequestURI();
         String method = request.getMethod();
         return (path.equals("/api/auth/register") || path.equals("/api/auth/login")) && "POST".equals(method)
-                || path.equals("/api/worlds") && "GET".equals(method);
+                || path.equals("/api/worlds") && "GET".equals(method)
+                || path.equals("/api/client-error") && "POST".equals(method);
     }
 }

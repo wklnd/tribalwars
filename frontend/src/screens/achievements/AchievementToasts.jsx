@@ -59,7 +59,7 @@ export function AchievementToasts({ enabled, go }) {
               {t.name}
               {t.level > 1 || t.level === 1 ? ` (Level ${t.level})` : ""}
               <br />
-              {t.description.replace("{n}", Number(t.threshold).toLocaleString("de-DE"))}
+              {(t.description ?? "").replace("{n}", Number(t.threshold).toLocaleString("de-DE"))}
             </p>
           </div>
         </div>

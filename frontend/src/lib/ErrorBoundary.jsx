@@ -18,6 +18,23 @@ export class ErrorBoundary extends Component {
 
   componentDidCatch(error, info) {
     console.error("Render crashed, caught by ErrorBoundary:", error, info.componentStack);
+    // Best-effort: nobody watches a real user's devtools console, so this is the only way we ever find out.
+    try {
+      fetch("/api/client-error", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: error?.message || String(error),
+          stack: error?.stack || "",
+          componentStack: info?.componentStack || "",
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          screen: window.location.hash,
+        }),
+      }).catch(() => {});
+    } catch {
+      /* ignore - reporting the crash must never itself crash */
+    }
   }
 
   render() {
