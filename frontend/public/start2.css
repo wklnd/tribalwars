@@ -1,0 +1,274 @@
+/**** start2.css - the start page (login/register/world select), restyled after tribalwars.net's real
+      2026 login/register page. Box-border/button/input textures are the real site's own image assets
+      (frontend/public/graphic/start2/, fetched with the user's explicit go-ahead - see git history);
+      everything else (layout, colors-as-CSS, the "tribalwars - nilz clone" branding) is ours. ****/
+
+html:has(body#home.tw2) { height: auto; }
+body#home.tw2 {
+  margin: 0;
+  background: #c9b997 url("/graphic/start2/background.webp");
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  color: #3b2308;
+}
+
+.tw2-page { max-width: 1000px; margin: 0 auto; padding: 0 16px 40px; }
+
+.tw2-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 4px;
+  border-bottom: 1px solid #b29f76;
+}
+.tw2-brand { font-weight: bold; color: #804000; font-size: 13px; }
+.tw2-topbar-links a {
+  font-weight: bold;
+  color: #804000;
+  text-decoration: none;
+  margin-left: 16px;
+  font-size: 12px;
+}
+.tw2-topbar-links a:hover { text-decoration: underline; color: #0082bd; }
+
+.tw2-banner {
+  background: url("/graphic/start2/bg-top.webp") repeat-x #b8935a;
+  border-radius: 4px;
+  margin: 16px 0;
+  padding: 26px 10px;
+  text-align: center;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+}
+.tw2-banner h1 {
+  margin: 0;
+  font-family: "MedievalSharp", "CrimsonText", Georgia, serif;
+  font-size: 44px;
+  line-height: 1.1;
+  color: #fbe8b8;
+  text-shadow: 2px 2px 0 #5c3a12, 0 0 10px rgba(0, 0, 0, 0.4);
+  letter-spacing: 1px;
+}
+.tw2-banner .sub { display: block; font-size: 16px; color: #f0d38a; margin-top: 4px; }
+
+/* Generic 9-slice box border: 4 corners + 4 edges from one corner image + one edge image each,
+   mirrored/rotated with transforms (same technique the real site uses). */
+.box-border { position: relative; width: 100%; }
+/* padding must clear the 20px corner/edge decoration (painted after .inner in DOM order, so it would
+   otherwise overlap the first ~4px of content on every side). */
+.box-border > .inner { position: relative; padding: 26px; }
+.box-border .top-left,
+.box-border .top-right,
+.box-border .bottom-left,
+.box-border .bottom-right,
+.box-border .middle-top,
+.box-border .middle-bottom,
+.box-border .middle-left,
+.box-border .middle-right {
+  position: absolute;
+}
+.box-border.red .top-left,
+.box-border.red .top-right,
+.box-border.red .bottom-left,
+.box-border.red .bottom-right {
+  width: 20px;
+  height: 20px;
+  background: url("/graphic/start2/box-border-red/border-corner.webp");
+}
+.box-border.red .top-left { top: 0; left: 0; }
+.box-border.red .top-right { top: 0; right: 0; transform: scaleX(-1); }
+.box-border.red .bottom-left { bottom: 0; left: 0; transform: scaleY(-1); }
+.box-border.red .bottom-right { bottom: 0; right: 0; transform: rotate(180deg); }
+.box-border.red .middle-top,
+.box-border.red .middle-bottom {
+  height: 20px;
+  left: 20px;
+  right: 20px;
+  background: url("/graphic/start2/box-border-red/border-top.webp") repeat-x;
+}
+.box-border.red .middle-top { top: 0; }
+.box-border.red .middle-bottom { bottom: 0; transform: rotate(180deg); }
+.box-border.red .middle-left,
+.box-border.red .middle-right {
+  width: 20px;
+  top: 20px;
+  bottom: 20px;
+  background: url("/graphic/start2/box-border-red/border-left.webp") repeat-y;
+}
+.box-border.red .middle-left { left: 0; }
+.box-border.red .middle-right { right: 0; transform: scaleX(-1); }
+.box-border.red { background: url("/graphic/start2/box-border-red/bg.webp"); border-radius: 2px; }
+
+.tw2-content { position: relative; margin-top: 8px; }
+.tw2-content .paladin {
+  position: absolute;
+  left: -92px;
+  top: -30px;
+  width: 214px;
+  height: 412px;
+  background: url("/graphic/start2/bg-paladin.webp") no-repeat;
+  pointer-events: none;
+}
+@media (max-width: 820px) {
+  .tw2-content .paladin { display: none; }
+}
+
+.tw2-columns { display: flex; align-items: stretch; }
+.tw2-columns .col { flex: 1 1 50%; min-width: 0; padding: 4px 26px; }
+.tw2-columns .col.narrow { flex: 0 1 auto; padding: 4px 16px; }
+.tw2-columns .col.wide { flex: 1 1 auto; }
+.tw2-columns .divider { flex: 0 0 auto; width: 12px; position: relative; align-self: stretch; }
+.tw2-columns .divider .bar {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 0;
+  right: 0;
+  background: url("/graphic/start2/box-border-red/divider-middle.webp") repeat-y;
+}
+.tw2-columns .divider .cap {
+  position: absolute;
+  left: -3.5px;
+  width: 19px;
+  height: 7px;
+  background: url("/graphic/start2/box-border-red/divider-top.webp");
+}
+.tw2-columns .divider .cap.top { top: 0; }
+.tw2-columns .divider .cap.bottom { bottom: 0; transform: scaleY(-1); }
+@media (max-width: 620px) {
+  .tw2-columns { flex-direction: column; }
+  .tw2-columns .divider { display: none; }
+  .tw2-columns .col { padding: 12px 16px; }
+}
+
+.tw2-content h2 { margin: 0 0 14px; font-size: 17px; color: #5c2f0c; }
+
+.tw2-field { display: block; margin-bottom: 14px; }
+.tw2-field label { display: block; font-weight: bold; margin-bottom: 4px; }
+.tw2-field .field-wrap { position: relative; }
+.tw2-field input[type="text"],
+.tw2-field input[type="password"],
+.tw2-field input[type="email"] {
+  background: #fff8e8;
+  height: 25px;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 12px;
+  padding: 0 6px;
+  border: 3px solid brown;
+  border-image: url("/graphic/start2/border-input.webp") 3 repeat;
+  outline: none;
+}
+.tw2-field .icon-locked {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  background: url("/graphic/start2/icons/locked.webp") no-repeat;
+  opacity: 0.7;
+  pointer-events: none;
+}
+.tw2-field .validation { margin-left: 6px; font-size: 11px; }
+.tw2-field .validation-true { color: #2e7d32; }
+.tw2-field .validation-false { color: #b71c1c; }
+.tw2-error-message {
+  margin-top: 4px;
+  padding: 4px 8px;
+  background: #fdeaea;
+  border: 1px solid #c62828;
+  color: #7a1414;
+  font-size: 11px;
+  border-radius: 2px;
+}
+
+.tw2-meta { font-size: 11px; margin: 6px 0 14px; }
+.tw2-meta a { color: #804000; font-weight: bold; }
+
+/* 3-slice ribbon button: fixed-width left/right caps + a repeating middle. */
+.tw2-btn-big {
+  display: flex;
+  height: 38px;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  background: none;
+  width: 100%;
+  margin: 4px 0 6px;
+}
+.tw2-btn-big .cap { flex: 0 0 10px; background: url("/graphic/start2/button-big/left.webp"); }
+.tw2-btn-big .cap.right { background: url("/graphic/start2/button-big/right.webp"); }
+.tw2-btn-big .mid {
+  flex: 1 1 auto;
+  background: url("/graphic/start2/button-big/middle.webp") repeat-x;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff2d0;
+  text-shadow: 1px 1px 0 #5c0000;
+}
+.tw2-btn-big:hover .mid,
+.tw2-btn-big:hover .cap { filter: brightness(1.08); }
+.tw2-btn-big:disabled { opacity: 0.6; cursor: default; }
+
+.tw2-worldlist h3 { margin: 14px 0 6px; font-size: 13px; color: #5c2f0c; }
+.tw2-worldlist ul { list-style: none; margin: 0 0 10px; padding: 0; }
+.tw2-worldlist li { padding: 3px 0; border-bottom: 1px dotted #cdb98a; }
+.tw2-worldlist li:last-child { border-bottom: none; }
+.tw2-worldlist a { color: #804000; font-weight: bold; text-decoration: none; }
+.tw2-worldlist a:hover { text-decoration: underline; color: #0082bd; }
+.tw2-worldlist .world-speed { opacity: 0.75; font-weight: normal; }
+
+.tw2-welcome { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+.tw2-welcome p { margin: 0; }
+.tw2-welcome .logout-link { font-size: 11px; }
+.tw2-welcome .logout-link a { color: inherit; text-decoration: underline; }
+
+.tw2-footer {
+  text-align: center;
+  margin-top: 26px;
+  padding-top: 10px;
+  border-top: 1px solid #b29f76;
+  font-size: 11px;
+  color: #7a5a2e;
+}
+
+.tw2-notice {
+  position: fixed;
+  left: 50%;
+  top: 16px;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background: #fdeaea;
+  border: 1px solid #c62828;
+  color: #7a1414;
+  padding: 10px 16px;
+  border-radius: 3px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  max-width: 90vw;
+  cursor: pointer;
+}
+
+/* Konami code easter egg (StartPage.spin in the original js/start.js). */
+.spin { animation: tw2-spin 2.5s infinite linear; }
+@keyframes tw2-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Join page reuses the same skin as the rest of the start experience. */
+.tw2-join p { line-height: 1.5; }
+.tw2-join .world-desc {
+  border: 1px solid #b29f76;
+  background: #fff8e8;
+  padding: 8px 10px;
+  margin: 10px 0;
+  border-radius: 2px;
+}
+.tw2-join .world-desc ul { margin: 0; padding-left: 18px; }
+.tw2-join .back-link { display: inline-block; margin-top: 10px; }
+.tw2-join .back-link a { color: #804000; font-weight: bold; }

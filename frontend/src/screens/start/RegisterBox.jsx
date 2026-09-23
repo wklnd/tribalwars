@@ -26,8 +26,6 @@ function fieldOfMessage(msg) {
   return /password/i.test(msg) && !/user ?name/i.test(msg) ? "password" : "name";
 }
 
-const stop = (e) => e.preventDefault();
-
 export function RegisterBox({ onRegister, onNotice }) {
   const [fields, setFields] = useState({ name: NONE, password: NONE });
   const [busy, setBusy] = useState(false);
@@ -91,108 +89,75 @@ export function RegisterBox({ onRegister, onNotice }) {
   };
 
   const spanOf = (t) => "validation validation-" + fields[t].status;
-  const boxStyle = (t) => (fields[t].shown ? { display: "block" } : undefined);
   const lines = (t) =>
     fields[t].message.split("\n").flatMap((m, i) => (i ? [<br key={"b" + i} />, m] : [m]));
 
   return (
     <div className="register">
-      <div className="container">
-        <div className="container-inner">
-          <div className="inner-content">
-            <h2 className="visuallyhidden">Register now!</h2>
-            <form action="#" method="post" id="register" ref={form} onSubmit={submit}>
-              {/* prevent browsers from autocompleting register form with login data */}
-              <input type="text" name="un" className="hidden" />
-              <input type="password" name="pa" className="hidden" />
-              <input type="hidden" name="server" value="zz1" readOnly />
-              <div className="form-element" id="form-element-name">
-                <label htmlFor="register_username">User name</label>
-                <input
-                  type="text"
-                  id="register_username"
-                  name="register_username"
-                  className="require-validation"
-                  data-type="name"
-                  defaultValue=""
-                  tabIndex={3}
-                  onFocus={onFocus("name")}
-                  onBlur={onBlur("name")}
-                />{" "}
-                <span className={spanOf("name")}></span>
-                <div className="error-message error-username l-clearfix" style={boxStyle("name")}>
-                  <div className="pointer"></div> <i className="icon-error"></i>
-                  <p className="message">{lines("name")}</p>
-                  <div className="message-suggestion-container" style={{ display: "none" }}>
-                    <div className="error-divider"></div>
-                    <div className="message-suggestion">
-                      <p>Suggested names:</p>
-                      <ul> </ul> <a href="#" id="message-suggestion-more-link" onClick={stop}>More...</a>{" "}
-                    </div>
-                  </div>
-                  {/* end .error-message*/}
-                </div>
-              </div>
-              {/* end .form-element */}
-              <div className="form-element" id="form-element-password">
-                <label htmlFor="register_password">Password</label>
-                <input
-                  type="password"
-                  id="register_password"
-                  name="register_password"
-                  className="require-validation"
-                  data-type="password"
-                  defaultValue=""
-                  tabIndex={4}
-                  onFocus={onFocus("password")}
-                  onBlur={onBlur("password")}
-                />{" "}
-                <span className={spanOf("password")}></span>
-                <div className="error-message error-password l-clearfix" style={boxStyle("password")}>
-                  <div className="pointer"></div> <i className="icon-error"></i>
-                  <p className="message"> {lines("password")}</p>
-                </div>
-              </div>
-              {/* end .form-element */}
-              {/* end .terms */}
-              <a
-                title="Register now!"
-                id="register-button"
-                href="#"
-                className="btn btn-calltoaction l-align-center"
-                tabIndex={7}
-                onClick={(e) => { e.preventDefault(); submit(); }}
-              >
-                {" "}
-                <span>{busy ? "Working..." : "Register now!"}</span>
-              </a>
-              <input type="submit" className="is-hidden" />
-              {/* end .register-alt */}
-            </form>
+      <h2>Create a new account</h2>
+      <form action="#" method="post" id="register" ref={form} onSubmit={submit}>
+        {/* prevent browsers from autocompleting register form with login data */}
+        <input type="text" name="un" className="hidden" style={{ display: "none" }} />
+        <input type="password" name="pa" className="hidden" style={{ display: "none" }} />
+        <input type="hidden" name="server" value="zz1" readOnly />
+        <div className="tw2-field" id="form-element-name">
+          <label htmlFor="register_username">User name:</label>
+          <div className="field-wrap">
+            <input
+              type="text"
+              id="register_username"
+              name="register_username"
+              className="require-validation"
+              data-type="name"
+              defaultValue=""
+              tabIndex={3}
+              onFocus={onFocus("name")}
+              onBlur={onBlur("name")}
+            />
           </div>
-          {/* end .inner-content */}
-          <div className="inner-top-left"></div>
-          <div className="inner-top"></div>
-          <div className="inner-top-right"></div>
-          <div className="inner-left"></div>
-          <div className="inner-middle"></div>
-          <div className="inner-right"></div>
-          <div className="inner-bottom-left"></div>
-          <div className="inner-bottom"></div>
-          <div className="inner-bottom-right"></div>
+          <span className={spanOf("name")}></span>
+          {fields.name.shown && (
+            <div className="tw2-error-message error-username">
+              <p className="message">{lines("name")}</p>
+            </div>
+          )}
         </div>
-        {/* end .register-container-inner */}
-        <div className="container-extension apps l-center-block l-clearfix"></div>
-        {/* end .container-extension */}
-        <div className="top-left"></div>
-        <div className="top-right"></div>
-        <div className="middle-top"></div>
-        <div className="middle-bottom"></div>
-        <div className="middle-left"></div>
-        <div className="middle-right"></div>
-        <div className="bottom-left"></div>
-        <div className="bottom-right"></div>
-      </div>
+        <div className="tw2-field" id="form-element-password">
+          <label htmlFor="register_password">Password:</label>
+          <div className="field-wrap">
+            <input
+              type="password"
+              id="register_password"
+              name="register_password"
+              className="require-validation"
+              data-type="password"
+              defaultValue=""
+              tabIndex={4}
+              onFocus={onFocus("password")}
+              onBlur={onBlur("password")}
+            />
+            <span className="icon-locked" />
+          </div>
+          <span className={spanOf("password")}></span>
+          {fields.password.shown && (
+            <div className="tw2-error-message error-password">
+              <p className="message">{lines("password")}</p>
+            </div>
+          )}
+        </div>
+        <button
+          title="Register now!"
+          id="register-button"
+          type="submit"
+          className="tw2-btn-big"
+          tabIndex={7}
+          disabled={busy}
+        >
+          <span className="cap left" />
+          <span className="mid">{busy ? "Working..." : "Register now!"}</span>
+          <span className="cap right" />
+        </button>
+      </form>
     </div>
   );
 }

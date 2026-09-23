@@ -15,14 +15,13 @@ export function NoticeBox({ notice }) {
   }, [key]);
 
   if (!notice || gone === key) return null;
-  const type = notice.type || "error";
   return (
     <div
-      className={"auto-hide-box " + type + "-box"}
+      className="tw2-notice"
       style={fading === key ? { opacity: 0, transition: "opacity 0.6s" } : undefined}
       onClick={() => setGone(key)}
     >
-      <i className={"icon-" + type}></i> <p>{String(notice.message).split("\n").flatMap((m, i) => (i ? [<br key={i} />, m] : [m]))}</p>
+      <p style={{ margin: 0 }}>{String(notice.message).split("\n").flatMap((m, i) => (i ? [<br key={i} />, m] : [m]))}</p>
     </div>
   );
 }

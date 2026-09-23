@@ -1,21 +1,26 @@
 // Page-level chrome swaps for the start experience. The React app normally shows game screens styled by
-// /game.css (+ overview.css ...), body#ds_body. The original's start pages are separate documents, so while they
-// are mounted we swap stylesheets / body id+class / <html> attributes / <title>, and return an exact undo function.
+// /game.css (+ overview.css ...), body#ds_body. The start pages (including the join page - it's part of the
+// same account flow, so it keeps the same skin rather than switching to a game.css page) are separate
+// documents styled by start2.css, so while any of them are mounted we swap stylesheets / body id+class /
+// <html> attributes / <title>, and return an exact undo function.
 
 export const START_TITLE = "tribalwars - nilz clone";
 export const JOIN_TITLE = "tribalwars - nilz clone - Join";
-// Stylesheets of the game shell (game.css is the join page's own stylesheet, so it is handled separately).
+// Stylesheets of the game shell.
 const CLASHING_START = ["/game.css", "/overview.css", "/map.css", "/village_target.css"];
-const CLASHING_JOIN = ["/overview.css", "/map.css", "/village_target.css"];
 
 function disableSheets(doc, hrefs, undo) {
   const links = Array.from(doc.querySelectorAll('link[rel="stylesheet"]')).filter((l) =>
     hrefs.includes((l.getAttribute("href") || "").split("?")[0]),
   );
+  // `link.disabled = true` should suffice, but the associated CSSStyleSheet's own `disabled` flag can end up
+  // out of sync with it (observed live: link.disabled reads true while its sheet.disabled reads false, and
+  // its rules keep applying) - detach the node instead, which unambiguously drops it from the cascade.
   for (const l of links) {
-    const was = l.disabled;
-    l.disabled = true;
-    undo.push(() => { l.disabled = was; });
+    const parent = l.parentNode;
+    const next = l.nextSibling;
+    l.remove();
+    undo.push(() => parent.insertBefore(l, next));
   }
 }
 
@@ -34,13 +39,9 @@ function setTitle(doc, title, undo) {
   undo.push(() => { doc.title = old; });
 }
 
-// start.css pages: <html dir="ltr" class="no-js">, <body dir="ltr" id="home" class=" "> (index/layouts/index.php)
-export function enterStartPage() {
-  const doc = document;
-  const undo = [];
+function enterStartSkin(doc, title, undo) {
   disableSheets(doc, CLASHING_START, undo);
-  // start.css + the inline <style> of the original's portal bar (kept as a file next to it)
-  for (const href of ["/start.css", "/worldselect-portalbar.css"]) {
+  for (const href of ["/start2.css"]) {
     const l = doc.createElement("link");
     l.rel = "stylesheet";
     l.type = "text/css";
@@ -48,7 +49,13 @@ export function enterStartPage() {
     doc.head.appendChild(l);
     undo.push(() => l.remove());
   }
-  // <meta name="viewport"> (the original start page is responsive)
+  // MedievalSharp: the banner title's display font. Loaded only while the start skin is mounted.
+  const fontLink = doc.createElement("link");
+  fontLink.rel = "stylesheet";
+  fontLink.href = "https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap";
+  doc.head.appendChild(fontLink);
+  undo.push(() => fontLink.remove());
+  // <meta name="viewport"> (the start pages are responsive)
   if (!doc.querySelector('meta[name="viewport"]')) {
     const m = doc.createElement("meta");
     m.name = "viewport";
@@ -56,18 +63,22 @@ export function enterStartPage() {
     doc.head.appendChild(m);
     undo.push(() => m.remove());
   }
-  setTitle(doc, START_TITLE, undo);
-  setAttrs(doc.body, { id: "home", class: " ", dir: "ltr" }, undo);
+  setTitle(doc, title, undo);
+  setAttrs(doc.body, { id: "home", class: "tw2", dir: "ltr" }, undo);
   setAttrs(doc.documentElement, { class: "no-js", dir: "ltr" }, undo);
+}
+
+export function enterStartPage() {
+  const doc = document;
+  const undo = [];
+  enterStartSkin(doc, START_TITLE, undo);
   return () => { for (let i = undo.length - 1; i >= 0; i--) undo[i](); };
 }
 
-// create_account.php ("Join <world>?"): a game.css page, <body id="ds_body" class="header">
+// create_account.php ("Join <world>?"): same start2.css skin as the rest of the account flow.
 export function enterJoinPage() {
   const doc = document;
   const undo = [];
-  disableSheets(doc, CLASHING_JOIN, undo);
-  setTitle(doc, JOIN_TITLE, undo);
-  setAttrs(doc.body, { id: "ds_body", class: "header" }, undo);
+  enterStartSkin(doc, JOIN_TITLE, undo);
   return () => { for (let i = undo.length - 1; i >= 0; i--) undo[i](); };
 }
