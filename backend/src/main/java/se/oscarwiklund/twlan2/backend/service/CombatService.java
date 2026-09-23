@@ -106,6 +106,9 @@ public class CombatService {
             outcome = duel.attackerWins() ? BattleOutcome.ATTACKER_WIN : BattleOutcome.DEFENDER_WIN;
             attackerLosses = duel.attackerLosses();
             defenderLosses = duel.defenderLosses();
+            if (outcome == BattleOutcome.DEFENDER_WIN && previousOwner != null) {
+                achievements.count(previousOwner, world, "scout_defended", 1);
+            }
         } else {
             // morale only weakens attacks on players who are much smaller than the attacker; barbarians never do
             double morale = 1;
@@ -132,7 +135,15 @@ public class CombatService {
         for (UnitType t : attackerUnits.keySet()) attackerLosses.putIfAbsent(t, 0);
 
         // the garrison and every guest army lose their share of the defence's losses
-        support.applyDefenderLosses(defenderVillage, defenderLosses);
+        Map<Long, Long> supporterLosses = support.applyDefenderLosses(defenderVillage, defenderLosses);
+        long attackerLossesSum = attackerLosses.values().stream().mapToLong(Integer::longValue).sum();
+        if (previousOwner != null) achievements.onDefend(previousOwner, world, attackerLossesSum);
+        for (Account supporter : supporters.values()) {
+            achievements.onSupport(supporter, world, attackerLossesSum);
+            achievements.count(supporter, world, "support_battles", 1);
+            Long lost = supporterLosses.get(supporter.getId());
+            if (lost != null) achievements.count(supporter, world, "support_losses", lost);
+        }
 
         // scouts that made it through report what they saw on arrival: the village as it was before the battle
         int spyScouts = survivors.getOrDefault(UnitType.SCOUT, 0);
@@ -149,6 +160,7 @@ public class CombatService {
                     wallAfter = wallBefore - lost;
                     damage(defenderVillage, BuildingType.WALL, wallAfter);
                     destroyed.merge(BuildingType.WALL, lost, Integer::sum);
+                    achievements.count(attackerOwner, world, "wall_levels_destroyed", lost);
                 }
             }
             int catapults = survivors.getOrDefault(UnitType.CATAPULT, 0);
@@ -163,6 +175,7 @@ public class CombatService {
                     if (lost > 0) {
                         damage(defenderVillage, target.getType(), target.getLevel() - lost);
                         destroyed.merge(target.getType(), lost, Integer::sum);
+                        achievements.count(attackerOwner, world, "building_levels_destroyed", lost);
                     }
                 }
             }
@@ -267,6 +280,13 @@ public class CombatService {
             live.toAccount(supporter, worldId, LiveUpdates.VILLAGE);
         }
         if (conquered) {
+            if (previousOwner != null && attackerOwner != null) {
+                if (previousOwner.getId().equals(attackerOwner.getId())) {
+                    achievements.count(attackerOwner, world, "self_conquest", 1);
+                } else {
+                    achievements.onConquered(previousOwner, world);
+                }
+            }
             conquests.conquer(defenderVillage, attackerOwner);
             achievements.onConquest(attackerOwner, defenderVillage.getWorld());
         }
@@ -299,6 +319,10 @@ public class CombatService {
                 outcome == BattleOutcome.ATTACKER_WIN, defenderUnits.values().stream().mapToLong(Integer::longValue).sum(),
                 defenderLosses.values().stream().mapToLong(Integer::longValue).sum(),
                 Math.round(lootWood + lootClay + lootIron), outcome == BattleOutcome.ATTACKER_WIN ? defenderLosses.getOrDefault(UnitType.SNOB, 0) : 0);
+
+        if (attackerOwner != null && previousOwner != null && attackerOwner.getId().equals(previousOwner.getId())) {
+            achievements.onSelfAttackLoss(attackerOwner, world, attackerLossesSum);
+        }
 
         wars.onBattle(defenderVillage.getWorld(), attackerOwner, previousOwner,
                 defenderLosses.values().stream().mapToLong(Integer::longValue).sum(),

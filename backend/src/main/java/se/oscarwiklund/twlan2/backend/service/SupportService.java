@@ -106,9 +106,10 @@ public class SupportService {
         return movements.save(back);
     }
 
-    // The garrison and every guest army lose their share of losses (empty armies vanish).
+    // The garrison and every guest army lose their share of losses (empty armies vanish). Returns how many units
+    // each guest's origin-village owner personally lost here, for the "death_of_a_hero" achievement.
     @Transactional
-    public void applyDefenderLosses(Village host, Map<UnitType, Integer> losses) {
+    public Map<Long, Long> applyDefenderLosses(Village host, Map<UnitType, Integer> losses) {
         List<UnitStock> stock = unitStock.findByVillage(host);
         List<StationedTroops> guests = stationed.findByHostVillage(host);
         List<Map<UnitType, Integer>> sources = new ArrayList<>();
@@ -122,8 +123,12 @@ public class SupportService {
             s.setCount(Math.max(0, s.getCount() - split.get(0).getOrDefault(s.getType(), 0)));
             unitStock.save(s);
         }
+        Map<Long, Long> lostByOwner = new HashMap<>();
         for (int i = 0; i < guests.size(); i++) {
             StationedTroops g = guests.get(i);
+            Account owner = g.getOriginVillage().getOwner();
+            long lost = split.get(i + 1).values().stream().mapToLong(Integer::longValue).sum();
+            if (owner != null && lost > 0) lostByOwner.merge(owner.getId(), lost, Long::sum);
             split.get(i + 1).forEach((t, n) -> {
                 int left = g.getUnits().getOrDefault(t, 0) - n;
                 if (left > 0) g.getUnits().put(t, left);
@@ -132,6 +137,7 @@ public class SupportService {
             if (g.isEmpty()) stationed.delete(g);
             else stationed.save(g);
         }
+        return lostByOwner;
     }
 
     // Its own troops stationed elsewhere are lost with it, not returned.

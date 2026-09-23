@@ -48,15 +48,17 @@ public class MarketService {
     private final VillageRepository villages;
     private final VillageService villageService;
     private final GameSettings settings;
+    private final AchievementService achievements;
 
     public MarketService(LiveUpdates live, TransportRepository transports, MarketOfferRepository offers, VillageRepository villages,
-                         VillageService villageService, GameSettings settings) {
+                         VillageService villageService, GameSettings settings, AchievementService achievements) {
         this.live = live;
         this.transports = transports;
         this.offers = offers;
         this.villages = villages;
         this.villageService = villageService;
         this.settings = settings;
+        this.achievements = achievements;
     }
 
     // ---- merchants -------------------------------------------------------------------------------------------------
@@ -252,6 +254,7 @@ public class MarketService {
         o.setRemaining(o.getRemaining() - times);
         if (o.getRemaining() <= 0) offers.delete(o);
         else offers.save(o);
+        if (acceptor.getOwner() != null) achievements.count(acceptor.getOwner(), acceptor.getWorld(), "market_trades", 1);
         return t;
     }
 

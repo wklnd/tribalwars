@@ -26,15 +26,18 @@ public class NobleService {
     private final TrainQueueItemRepository trainQueue;
     private final MovementRepository movements;
     private final VillageService villageService;
+    private final AchievementService achievements;
 
     public NobleService(NobleCoinsRepository coinRepository, VillageRepository villages, UnitStockRepository unitStock,
-                        TrainQueueItemRepository trainQueue, MovementRepository movements, VillageService villageService) {
+                        TrainQueueItemRepository trainQueue, MovementRepository movements, VillageService villageService,
+                        AchievementService achievements) {
         this.coinRepository = coinRepository;
         this.villages = villages;
         this.unitStock = unitStock;
         this.trainQueue = trainQueue;
         this.movements = movements;
         this.villageService = villageService;
+        this.achievements = achievements;
     }
 
     static int coinsForLimit(int n) { return n * (n + 1) / 2; }
@@ -99,6 +102,7 @@ public class NobleService {
         NobleCoins c = row(account, world);
         c.setCoins(c.getCoins() + 1);
         coinRepository.save(c);
+        achievements.count(account, world, "coins_minted", 1);
     }
 
     public void checkCanEducate(Village village, int count) {

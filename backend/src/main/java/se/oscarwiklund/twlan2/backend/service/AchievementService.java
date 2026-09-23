@@ -29,10 +29,11 @@ public class AchievementService {
     private final WorldRepository worlds;
     private final VillageRepository villages;
     private final BuildingRepository buildings;
+    private final TribeMemberRepository tribeMembers;
 
     public AchievementService(LiveUpdates live, WorldPoints worldPoints, AchievementCounterRepository counters, AchievementUnlockRepository unlocks,
                               DailyStatRepository dailyStats, AccountRepository accounts, WorldRepository worlds,
-                              VillageRepository villages, BuildingRepository buildings) {
+                              VillageRepository villages, BuildingRepository buildings, TribeMemberRepository tribeMembers) {
         this.live = live;
         this.worldPoints = worldPoints;
         this.counters = counters;
@@ -42,6 +43,7 @@ public class AchievementService {
         this.worlds = worlds;
         this.villages = villages;
         this.buildings = buildings;
+        this.tribeMembers = tribeMembers;
     }
 
     // ---- recording -----------------------------------------------------------------------------------------
@@ -90,6 +92,21 @@ public class AchievementService {
         counters.save(c);
     }
 
+    // Like set(), but only replaces the value when the new one is bigger (peak-of-a-single-event achievements).
+    private void setMax(Account account, World world, String key, long value) {
+        AchievementCounter c = counters.findByAccountIdAndWorldIdAndCounterKey(account.getId(), world.getId(), key).orElseGet(() -> {
+            AchievementCounter n = new AchievementCounter();
+            n.setAccountId(account.getId());
+            n.setWorldId(world.getId());
+            n.setCounterKey(key);
+            return n;
+        });
+        if (value > c.getValue()) {
+            c.setValue(value);
+            counters.save(c);
+        }
+    }
+
     // defenderOwner is null for barbarian villages; the losses are unit totals.
     @Transactional
     public void onBattle(Account attacker, Account defenderOwner, World world, boolean attackerWon, long defenderUnitsBefore,
@@ -131,6 +148,45 @@ public class AchievementService {
         evaluate(attacker, world);
     }
 
+    // A real player's village was conquered while under someone else's attack, and their beginner protection
+    // had expired within the last week ("victim").
+    @Transactional
+    public void onConquered(Account previousOwner, World world) {
+        if (!earns(previousOwner, world) || world == null || previousOwner.getCreatedAt() == null) return;
+        double protectionMinutes = WorldSettings.number(world, "beginnerProtection");
+        Instant protectionEnd = previousOwner.getCreatedAt().plusSeconds((long) (protectionMinutes * 60));
+        Instant now = Instant.now();
+        if (!now.isBefore(protectionEnd) && now.isBefore(protectionEnd.plus(7, ChronoUnit.DAYS))) {
+            count(previousOwner, world, "conquered_after_protection", 1);
+        }
+    }
+
+    // Units the attacker lost that were destroyed while defending this village ("defender_of_day"/"protector").
+    @Transactional
+    public void onDefend(Account defender, World world, long attackerLosses) {
+        if (!earns(defender, world) || world == null || attackerLosses <= 0) return;
+        DailyStat day = today(world, defender);
+        day.setDefended(day.getDefended() + attackerLosses);
+        dailyStats.save(day);
+    }
+
+    // Same, credited to a tribe-mate whose stationed troops helped fight off the attack ("supporter_of_day"/"stalwart").
+    @Transactional
+    public void onSupport(Account supporter, World world, long attackerLosses) {
+        if (!earns(supporter, world) || world == null || attackerLosses <= 0) return;
+        DailyStat day = today(world, supporter);
+        day.setSupported(day.getSupported() + attackerLosses);
+        dailyStats.save(day);
+    }
+
+    // The biggest single-battle loss count from attacking your own village ("self_attack" tracks a peak, not a sum).
+    @Transactional
+    public void onSelfAttackLoss(Account attacker, World world, long lostThisBattle) {
+        if (!earns(attacker, world) || world == null || lostThisBattle <= 0) return;
+        setMax(attacker, world, "self_attack_max", lostThisBattle);
+        evaluate(attacker, world);
+    }
+
     private void markOnce(Account account, World world, String key) {
         if (counters.findByAccountIdAndWorldIdAndCounterKey(account.getId(), world.getId(), key).isEmpty()) {
             bump(account, world, key, 1);
@@ -157,6 +213,11 @@ public class AchievementService {
         long years = account.getCreatedAt() == null ? 0 : ChronoUnit.YEARS.between(
                 account.getCreatedAt().atZone(java.time.ZoneId.systemDefault()).toLocalDate(), LocalDate.now());
         v.put("years", Math.max(0, years));
+        // consecutive days in the current tribe: naturally resets on every join (leaving/switching starts a new row)
+        long tribeDays = tribeMembers.findByWorldIdAndAccountId(world.getId(), account.getId())
+                .map(m -> Math.max(0, ChronoUnit.DAYS.between(m.getJoinedAt(), Instant.now())))
+                .orElse(0L);
+        v.put("tribe_days", tribeDays);
         return v;
     }
 
@@ -197,11 +258,13 @@ public class AchievementService {
         }
     }
 
+    private static final Set<String> DAILY_REPEATS = Set.of("vanquisher", "affluent", "protector", "stalwart");
+
     // The plain "of the day" achievement and its "repeat" counterpart share the same counter.
     static long valueOf(AchievementCatalog.Def d, Map<String, Long> v) {
         if (d.metric() == null) return 0;
         long value = v.getOrDefault(d.metric(), 0L);
-        return d.key().equals("vanquisher") || d.key().equals("affluent") ? (value >= 2 ? 1 : 0) : value;
+        return DAILY_REPEATS.contains(d.key()) ? (value >= 2 ? 1 : 0) : value;
     }
 
     // ---- periodic: points, ranks, daily winners --------------------------------------------------------------
@@ -256,6 +319,8 @@ public class AchievementService {
             award(world, stats, DailyStat::getLoot, "won_looter_day");
             award(world, stats, DailyStat::getPlunders, "won_plunderer_day");
             award(world, stats, DailyStat::getConquests, "won_conquer_day");
+            award(world, stats, DailyStat::getDefended, "won_defender_day");
+            award(world, stats, DailyStat::getSupported, "won_supporter_day");
         }
         AchievementCounter c = marker.orElseGet(() -> {
             AchievementCounter n = new AchievementCounter();

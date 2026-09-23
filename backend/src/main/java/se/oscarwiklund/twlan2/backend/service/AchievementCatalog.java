@@ -40,45 +40,45 @@ public final class AchievementCatalog {
     static {
         // ---- daily ------------------------------------------------------------------------------------------
         a(DAILY, "attacker_of_day", "Attacker of the day", "Defeat the most units in this world as the attacker", "award10", "won_attacker_day", 1);
-        a(DAILY, "defender_of_day", "Defender of the day", "Defeat the most units in this world as the defender", "award11", null, 1);
+        a(DAILY, "defender_of_day", "Defender of the day", "Defeat the most units in this world as the defender", "award11", "won_defender_day", 1);
         a(DAILY, "looter_of_day", "Looter of the day", "Plunder the most resources in this world", "farmer_of_the_day", "won_looter_day", 1);
         a(DAILY, "plunderer_of_day", "Plunderer of the day", "Plunder the most villages in this world", "award12", "won_plunderer_day", 1);
         a(DAILY, "great_power_of_day", "Great power of the day", "Conquer the most villages in this world", "award9", "won_conquer_day", 1);
-        a(DAILY, "supporter_of_day", "Supporter of the day", "Defeat the most units in this world as a supporter", "award13", null, 1);
+        a(DAILY, "supporter_of_day", "Supporter of the day", "Defeat the most units in this world as a supporter", "award13", "won_supporter_day", 1);
         a(DAILY, "gatherer_of_day", "Gatherer of the day", "Scavenge the most resources in this world", "farmer_of_the_day", null, 1);
 
         // ---- combat -----------------------------------------------------------------------------------------
         a(COMBAT, "unlucky_fellow", "Unlucky fellow", "Fail to conquer a village due to the loyalty only being reduced to +1", "award15", "unlucky", 1);
         a(COMBAT, "lucky_fellow", "Lucky fellow", "Conquer a village by getting the loyalty down to exactly 0", "award14", "lucky", 1);
-        a(COMBAT, "victim", "Victim", "Be conquered within one week of your beginner protection expiring", "award19", null, 1);
-        a(COMBAT, "self_conquest", "Self-conquest", "Conquer yourself, because that's the only way to show them who's boss", "award18", null, 1);
+        a(COMBAT, "victim", "Victim", "Be conquered within one week of your beginner protection expiring", "award19", "conquered_after_protection", 1);
+        a(COMBAT, "self_conquest", "Self-conquest", "Conquer yourself, because that's the only way to show them who's boss", "award18", "self_conquest", 1);
         a(COMBAT, "warlord", "The Warlord", "Attack {n} different players", "warmonger", "targets", 10, 25, 100, 250);
-        a(COMBAT, "demolisher", "Demolisher", "Destroy {n} building levels using catapults", "demolisher", null, 25, 250, 2500, 10000);
-        a(COMBAT, "death_of_a_hero", "Death of a hero", "Lose {n} of your units while supporting other villages", "award6", null, 1000, 7500, 20000, 100000);
+        a(COMBAT, "demolisher", "Demolisher", "Destroy {n} building levels using catapults", "demolisher", "building_levels_destroyed", 25, 250, 2500, 10000);
+        a(COMBAT, "death_of_a_hero", "Death of a hero", "Lose {n} of your units while supporting other villages", "award6", "support_losses", 1000, 7500, 20000, 100000);
         a(COMBAT, "plunderer", "Plunderer", "Plunder other villages {n} times", "award4", "plunders", 10, 100, 1000, 10000);
         a(COMBAT, "nobles_faith", "Nobles Faith", "Defeat {n} nobleman", "nobles_faith", "nobles_killed", 1, 25, 100, 500);
-        a(COMBAT, "noble_claims", "Successful noble claims", "Noble {n} claimed villages", "award5", null, 5, 25, 50, 100);
+        a(COMBAT, "noble_claims", "Successful noble claims", "Noble {n} claimed villages", "award5", "conquests", 5, 25, 50, 100);
         a(COMBAT, "robber", "Robber", "Loot {n} resources", "award2", "loot", 500, 10000, 1000000, 100000000);
-        a(COMBAT, "scout_hunter", "Scout Hunter", "Fend off {n} scout attacks", "scout_hunter", null, 25, 50, 250, 500);
-        a(COMBAT, "reliable_commander", "Reliable Commander", "Support another player in {n} battles", "reliable_commander", null, 50, 100, 500, 3000);
+        a(COMBAT, "scout_hunter", "Scout Hunter", "Fend off {n} scout attacks", "scout_hunter", "scout_defended", 25, 50, 250, 500);
+        a(COMBAT, "reliable_commander", "Reliable Commander", "Support another player in {n} battles", "reliable_commander", "support_battles", 50, 100, 500, 3000);
         a(COMBAT, "conquest", "Conquest", "Conquer {n} villages", "award3", "conquests", 5, 50, 500, 1000);
         a(COMBAT, "master_of_the_battlefield", "Master of the Battlefield", "Completely destroy {n} hostile armies", "master_of_the_battlefield", "armies", 25, 250, 1000, 2500);
-        a(COMBAT, "wallbreaker", "Wallbreaker", "Destroy {n} Wall levels using your rams", "wallbreaker", null, 25, 250, 2500, 10000);
+        a(COMBAT, "wallbreaker", "Wallbreaker", "Destroy {n} Wall levels using your rams", "wallbreaker", "wall_levels_destroyed", 25, 250, 2500, 10000);
         a(COMBAT, "stronghold_crusher", "Stronghold crusher", "Reduce the level of a Stronghold {n} times", "award20", null, 10, 40, 70, 100);
         a(COMBAT, "leader", "Leader", "Defeat a total of {n} enemy units", "award16", "kills", 10000, 100000, 1000000, 20000000);
-        a(COMBAT, "self_attack", "Self-attack", "Attack yourself and lose more than {n} units in one battle", "award17", null, 10, 100, 1000, 10000);
+        a(COMBAT, "self_attack", "Self-attack", "Attack yourself and lose more than {n} units in one battle", "award17", "self_attack_max", 10, 100, 1000, 10000);
 
         // ---- social -----------------------------------------------------------------------------------------
         a(SOCIAL, "educated", "Educated", "Graduate from an apprenticeship", "dummy", null, 1);
         a(SOCIAL, "philanthropist", "Philanthropist", "Gift a Premium subscription to {n} player", "dummy", null, 1, 5, 15, 30);
         a(SOCIAL, "successful_recruitment", "Successful recruitment", "Invite {n} friend", "dummy", null, 1, 5, 10, 25);
         a(SOCIAL, "mentor", "The mentor", "As a mentor, graduate {n} apprentice", "dummy", null, 1, 3, 5, 8);
-        a(SOCIAL, "brothers_in_arms", "Brothers in Arms", "Be a member of the same tribe for {n} consecutive days", "brothers_in_arms", null, 30, 60, 180, 360);
+        a(SOCIAL, "brothers_in_arms", "Brothers in Arms", "Be a member of the same tribe for {n} consecutive days", "brothers_in_arms", "tribe_days", 30, 60, 180, 360);
         a(SOCIAL, "beloved_friend", "Beloved Friend", "Make a total of {n} friendships", "beloved_friends", null, 5, 15, 50, 100);
 
         // ---- growth -----------------------------------------------------------------------------------------
-        a(GROWTH, "wealth_in_gold", "Wealth comes in gold", "Mint {n} gold coins", "wealth_comes_in_gold", null, 50, 500, 5000, 50000);
-        a(GROWTH, "market_guru", "Market Guru", "Trade using your market {n} times", "market_guru", null, 10, 100, 500, 1000);
+        a(GROWTH, "wealth_in_gold", "Wealth comes in gold", "Mint {n} gold coins", "wealth_comes_in_gold", "coins_minted", 50, 500, 5000, 50000);
+        a(GROWTH, "market_guru", "Market Guru", "Trade using your market {n} times", "market_guru", "market_trades", 10, 100, 500, 1000);
         a(GROWTH, "master_of_quests", "Master of Quests", "Complete {n} quests", "dummy", null, 40);
         a(GROWTH, "out_of_time", "Out of time", "Use the instant complete option {n} times", "award7", "instant", 15, 100, 2000, 8000);
         a(GROWTH, "architect", "Architect", "Build a total of {n} building levels", "award13", "levels", 10, 150, 5000, 100000);
@@ -138,8 +138,8 @@ public final class AchievementCatalog {
         other("Calendar & Card Game Events", "strategist", "The Strategist", "Perform {n} double, triple or quadruple changes", "beloved_friends", 5, 10, 20, 30);
 
         add(OTHER, "Daily Achievement Repeats", "vanquisher", "The Vanquisher", "Be the first who defeats the most units in this world as the attacker on 2 different days", "award10", "won_attacker_day", false, 1);
-        other("Daily Achievement Repeats", "protector", "The Protector", "Be the first who defeats the most units in this world as the defender on 2 different days", "award11", 1);
-        other("Daily Achievement Repeats", "stalwart", "The Stalwart", "Be the first who defeats the most units in this world as the supporter on 2 different days", "award13", 1);
+        add(OTHER, "Daily Achievement Repeats", "protector", "The Protector", "Be the first who defeats the most units in this world as the defender on 2 different days", "award11", "won_defender_day", false, 1);
+        add(OTHER, "Daily Achievement Repeats", "stalwart", "The Stalwart", "Be the first who defeats the most units in this world as the supporter on 2 different days", "award13", "won_supporter_day", false, 1);
         add(OTHER, "Daily Achievement Repeats", "affluent", "The Affluent", "Be the first who loots the most resources in this world on 2 different days", "farmer_of_the_day", "won_looter_day", false, 1);
     }
 

@@ -18,6 +18,11 @@ public class DailyStat {
     private long loot;
     private long plunders;
     private Long conquests;
+    // nullable like conquests (not a bare "long"): ddl-auto=update cannot ALTER TABLE ADD COLUMN NOT NULL on an
+    // already-populated table (see the "Something went wrong loading the game" incident - TrainQueueItem.decommission
+    // was added as a bare NOT NULL boolean and every query touching it 500'd until the column got a default).
+    private Long defended;
+    private Long supported;
 
     public Long getId() { return id; }
     public Long getWorldId() { return worldId; }
@@ -35,4 +40,9 @@ public class DailyStat {
 
     public long getConquests() { return conquests == null ? 0 : conquests; }
     public void setConquests(long conquests) { this.conquests = conquests; }
+
+    public long getDefended() { return defended == null ? 0 : defended; }
+    public void setDefended(long defended) { this.defended = defended; }
+    public long getSupported() { return supported == null ? 0 : supported; }
+    public void setSupported(long supported) { this.supported = supported; }
 }
