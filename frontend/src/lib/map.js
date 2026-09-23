@@ -120,13 +120,16 @@ export function buildVillageInfos(villages, home, playerName, homePoints, outgoi
     if (tribe?.tribeId && v.ownerTribeId === tribe.tribeId) return "ally";
     return RELATION[tribe?.relations?.[v.ownerTribeId]] ?? null;
   };
-  const icons = new Map(); // village name -> command icon names
-  const addIcon = (name, img) => {
-    if (!icons.has(name)) icons.set(name, []);
-    if (!icons.get(name).includes(img)) icons.get(name).push(img);
+  // Keyed by village id, not name: every barbarian village is literally named "Abandoned Camp" (WorldService),
+  // so keying by name made one outgoing attack paint the icon onto every barbarian village on the map.
+  const icons = new Map(); // village id -> command icon names
+  const addIcon = (id, img) => {
+    if (id == null) return;
+    if (!icons.has(id)) icons.set(id, []);
+    if (!icons.get(id).includes(img)) icons.get(id).push(img);
   };
-  outgoing.forEach((m) => addIcon(m.otherVillageName, m.type === "SUPPORTING" ? "support" : "attack"));
-  incoming.forEach((m) => addIcon(m.otherVillageName, m.type === "SUPPORT_IN" ? "support" : m.type === "INCOMING_ATTACK" ? "attack" : "return"));
+  outgoing.forEach((m) => addIcon(m.targetVillageId, m.type === "SUPPORTING" ? "support" : "attack"));
+  incoming.forEach((m) => addIcon(m.originVillageId, m.type === "SUPPORT_IN" ? "support" : m.type === "INCOMING_ATTACK" ? "attack" : "return"));
   const isOwn = (v) => v.id === home.id || (v.ownerType === "PLAYER" && v.ownerName === playerName);
   const pointsOf = (v) => (typeof v.points === "number" ? v.points : v.id === home.id ? homePoints : 100);
   // total points per owner (the popup shows "Owner (N points)")
@@ -161,7 +164,7 @@ export function buildVillageInfos(villages, home, playerName, homePoints, outgoi
       tribeName: tribeRow?.name ?? null,
       tribePoints: tribeRow?.points ?? 0,
       bonus: v.bonus ?? null,
-      icons: icons.get(v.name) ?? [],
+      icons: icons.get(v.id) ?? [],
     };
   });
 }
