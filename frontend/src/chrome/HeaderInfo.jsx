@@ -107,7 +107,7 @@ export function HeaderInfo({ village, go, now, fetchedAt, onSwitchVillage, onSel
     );
   };
 
-  const incomingAttacks = village.incomingMovements.filter((m) => m.type === "INCOMING_ATTACK" || m.type === "ATTACKING").length;
+  const incomingAttacks = (village.incomingMovements ?? []).filter((m) => m.type === "INCOMING_ATTACK" || m.type === "ATTACKING").length;
 
   return (
     <table id="header_info" align="center" width="100%" cellSpacing="0">

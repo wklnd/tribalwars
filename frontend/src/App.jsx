@@ -3,6 +3,7 @@ import { api, getStoredWorld, setWorldId, getToken, setToken, getVillageId, setV
 import { fmtClock, fmtDate, villagePoints, setPlayerName, PLAYER_NAME } from "./lib/data";
 import { lsGet, lsSet } from "./lib/overview";
 import { useNow, MissingScreen, CLASS_NAMES, PreContentContext } from "./lib/ui";
+import { ErrorBoundary } from "./lib/ErrorBoundary";
 import { TopMenu } from "./chrome/TopMenu";
 import { HeaderInfo } from "./chrome/HeaderInfo";
 import { syncFarmConfig } from "./lib/farm";
@@ -469,7 +470,9 @@ export default function App() {
           <tr style={{ height: 48 }}>
             <td className="topbar left" />
             <td className="topbar center">
-              <TopMenu go={go} unreadReports={unreadReports} newForumPost={village?.newForumPost ?? false} newMails={village?.newMails ?? 0} points={standing.points} rank={standing.rank} />
+              <ErrorBoundary resetKey={fetchedAt} fallback={() => null}>
+                <TopMenu go={go} unreadReports={unreadReports} newForumPost={village?.newForumPost ?? false} newMails={village?.newMails ?? 0} points={standing.points} rank={standing.rank} />
+              </ErrorBoundary>
             </td>
             <td className="topbar right" />
           </tr>
@@ -486,7 +489,9 @@ export default function App() {
                   <span className="victory-sub">The world is closed; no further action is possible.</span>
                 </div>
               )}
-              <HeaderInfo village={village} go={go} now={now} fetchedAt={fetchedAt} onSwitchVillage={switchVillage} onSelectVillage={selectVillage} groups={villageGroups} />
+              <ErrorBoundary resetKey={fetchedAt}>
+                <HeaderInfo village={village} go={go} now={now} fetchedAt={fetchedAt} onSwitchVillage={switchVillage} onSelectVillage={selectVillage} groups={villageGroups} />
+              </ErrorBoundary>
               <table align="center" id="contentContainer" width="100%">
                 <tbody>
                   <tr>
@@ -506,7 +511,9 @@ export default function App() {
                                       )}
                                       {pre && <div className="error_box"> {pre} </div>}
                                       <div id="content_point" />
-                                      <PreContentContext.Provider value={setPre}>{content}</PreContentContext.Provider>
+                                      <ErrorBoundary resetKey={screen}>
+                                        <PreContentContext.Provider value={setPre}>{content}</PreContentContext.Provider>
+                                      </ErrorBoundary>
                                     </td>
                                   </tr>
                                 </tbody>
