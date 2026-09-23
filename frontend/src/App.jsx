@@ -295,9 +295,10 @@ export default function App() {
     showInfo("Construction completed.");
   });
   const handleTrain = wrap((type, count) => api.train(type, count));
+  const handleDecommission = wrap((type, count) => api.decommission(type, count));
   const handleCancelTrain = wrap(async (e) => {
     await api.cancelTrain(e.id);
-    showInfo("Recruitment order cancelled.");
+    showInfo(e.decommission ? "Decommissioning order cancelled." : "Recruitment order cancelled.");
   });
   const handleRenamePaladin = wrap((name) => api.renamePaladin(name));
   const handleResearch = wrap(async (type) => {
@@ -424,14 +425,14 @@ export default function App() {
   else if (screenName === "info_village" && mode) content = <InfoVillageScreen id={mode} village={village} villages={villages} go={go} />;
   else if (screenName === "info_command" && mode) content = <InfoCommandScreen id={mode} village={village} villages={villages} go={go} />;
   else if (screenName === "info_ally") content = <InfoAllyScreen id={mode} go={go} />;
-  else if (screenName === "train") content = <TrainScreen village={village} onTrain={handleTrain} onCancelTrain={handleCancelTrain} busy={busy} go={go} />;
+  else if (screenName === "train") content = <TrainScreen village={village} onTrain={handleTrain} onDecommission={handleDecommission} onCancelTrain={handleCancelTrain} busy={busy} go={go} />;
   else if (screenName === "market") content = <MarketScreen village={village} villages={villages} go={go} />;
   else if (screenName === "place")
     content = <PlaceScreen village={village} villages={villages} reports={reports} onAttack={handleAttack} onSupport={handleSupport} onWithdraw={handleWithdraw} onSendBack={handleSendBack} busy={busy} go={go} />;
   else if (screenName === "building")
     content = <BuildingScreen village={village} type={mode} onBuild={handleBuild} onCancelBuild={handleCancelBuild} onFinishBuild={handleFinishBuild} onRename={handleRename} onTrain={handleTrain} onCancelTrain={handleCancelTrain} onRenamePaladin={handleRenamePaladin} onMintCoin={handleMintCoin} onResearch={handleResearch} onCancelResearch={handleCancelResearch} busy={busy} go={go} />;
   else if (TRAIN_BUILDING_IDS.includes(screenName))
-    content = <TrainBuildingScreen village={village} id={screenName} onTrain={handleTrain} onCancelTrain={handleCancelTrain} busy={busy} go={go} />;
+    content = <TrainBuildingScreen village={village} id={screenName} onTrain={handleTrain} onDecommission={handleDecommission} onCancelTrain={handleCancelTrain} busy={busy} go={go} />;
   else if (REAL_BUILDING_SCREENS.has(screenName))
     content = <BuildingScreen village={village} type={screenName} onBuild={handleBuild} onCancelBuild={handleCancelBuild} onFinishBuild={handleFinishBuild} onRename={handleRename} onTrain={handleTrain} onCancelTrain={handleCancelTrain} onRenamePaladin={handleRenamePaladin} onMintCoin={handleMintCoin} onResearch={handleResearch} onCancelResearch={handleCancelResearch} busy={busy} go={go} />;
   else if (screenName === "overview")

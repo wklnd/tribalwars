@@ -72,7 +72,7 @@ public record VillageStateDto(
 
     public record BuildQueueDto(String type, int targetLevel, Instant startedAt, Instant completesAt, Long id, long durationSeconds) {}
 
-    public record TrainQueueDto(String type, int totalCount, int producedCount, Instant startedAt, Instant completesAt, Long id, long perUnitSeconds) {}
+    public record TrainQueueDto(String type, int totalCount, int producedCount, Instant startedAt, Instant completesAt, Long id, long perUnitSeconds, boolean decommission) {}
 
     public record UnitCostDto(String type, int wood, int clay, int iron, int pop, int attack, int defense,
                                int speedMinutesPerField, int carryCapacity, int defenseCavalry, int defenseArcher) {}

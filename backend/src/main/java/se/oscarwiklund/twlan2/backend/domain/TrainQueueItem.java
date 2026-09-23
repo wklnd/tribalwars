@@ -27,6 +27,10 @@ public class TrainQueueItem {
 
     private int position;
 
+    // true: this order removes units on completion (Decommissioning) instead of adding them. Shares the same
+    // per-building queue/position numbering as ordinary recruiting, like the original's queue.php does.
+    private boolean decommission;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -53,4 +57,7 @@ public class TrainQueueItem {
 
     public int getPosition() { return position; }
     public void setPosition(int position) { this.position = position; }
+
+    public boolean isDecommission() { return decommission; }
+    public void setDecommission(boolean decommission) { this.decommission = decommission; }
 }

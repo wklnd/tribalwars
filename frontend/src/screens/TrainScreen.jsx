@@ -76,6 +76,7 @@ export function queueEvents(village, now) {
       duration: Math.max(0, end - (active ? now : from)),
       finish: end,
       nextAt: active ? new Date(t.startedAt).getTime() + (t.producedCount + 1) * per * 1000 : null,
+      decommission: !!t.decommission,
     });
     finishOf[building] = end;
   });
@@ -120,7 +121,7 @@ export function TrainQueue({ events, bid, now, onCancel }) {
                 const u = UNIT_BY_ID[e.unit];
                 return (
                   <tr key={i} className={e.active ? "lit" : "sortable_row"} id={e.active ? undefined : `trainorder_${c++}`}>
-                    <td className={cls}>{`${e.amount} ${e.amount === 1 ? u.name : u.plural}`}</td>
+                    <td className={cls + (e.decommission ? " decommission" : "")}>{`${e.decommission ? "-" : ""}${e.amount} ${e.amount === 1 ? u.name : u.plural}`}</td>
                     <td className={cls}>
                       {e.active ? (
                         <span className="timer">{fmtBuildTime(e.duration)}</span>
@@ -135,7 +136,7 @@ export function TrainQueue({ events, bid, now, onCancel }) {
                         href="#"
                         onClick={(ev) => {
                           ev.preventDefault();
-                          if (onCancel) confirmBox("Are you sure you want to cancel this recruitment order?", () => onCancel(e));
+                          if (onCancel) confirmBox(`Are you sure you want to cancel this ${e.decommission ? "decommissioning" : "recruitment"} order?`, () => onCancel(e));
                         }}
                       >
                         cancel
@@ -200,7 +201,7 @@ function affordability(village, cost, now) {
 }
 
 /* ---- train/building.php: queue + recruit form + "not available" table for the units of `buildings` ---- */
-function TrainBody({ village, buildings, queueId, isTrain, onTrain, onCancelTrain, busy, go }) {
+function TrainBody({ village, buildings, queueId, isTrain, onTrain, onDecommission, onCancelTrain, busy, go }) {
   const now = useNowTick();
   const popup = useUnitPopup();
   const [counts, setCounts] = useState({});
@@ -245,13 +246,13 @@ function TrainBody({ village, buildings, queueId, isTrain, onTrain, onCancelTrai
     e.preventDefault();
     const orders = available.filter((id) => typed(id) > 0).map((id) => [id, typed(id)]);
     if (orders.length === 0) return;
-    if (!isTrain) return showMessage("Decommissioning is not supported by the server yet.", "error");
+    const send = isTrain ? onTrain : onDecommission;
     setSending(true);
     try {
       let ok = true;
-      for (const [id, n] of orders) ok = (await onTrain(ID_TO_TYPE[id], n)) === true && ok;
+      for (const [id, n] of orders) ok = (await send(ID_TO_TYPE[id], n)) === true && ok;
       setCounts({});
-      if (ok) showMessage("Recruitment started", "success");
+      if (ok) showMessage(isTrain ? "Recruitment started" : "Decommissioning started", "success");
     } finally {
       setTimeout(() => setSending(false), 500);
     }
@@ -407,7 +408,7 @@ function TrainBody({ village, buildings, queueId, isTrain, onTrain, onCancelTrai
 }
 
 /* ---- screen=train: recruitment overview (all buildings' units) ---- */
-export function TrainScreen({ village, onTrain, onCancelTrain, busy, go }) {
+export function TrainScreen({ village, onTrain, onDecommission, onCancelTrain, busy, go }) {
   const [parts, navigate] = useHashNav("train", go);
   const mode = parts[0] === "decommission" ? "decommission" : "train";
   const tab = (m) => (m === mode ? "selected" : undefined);
@@ -440,6 +441,7 @@ export function TrainScreen({ village, onTrain, onCancelTrain, busy, go }) {
         queueId="barracks"
         isTrain={mode === "train"}
         onTrain={onTrain}
+        onDecommission={onDecommission}
         onCancelTrain={onCancelTrain}
         busy={busy}
         go={go}
@@ -449,7 +451,7 @@ export function TrainScreen({ village, onTrain, onCancelTrain, busy, go }) {
 }
 
 /* ---- screen=barracks|stable|garage, level > 0: layouts/building.php (mode menu) around train/building.php ---- */
-export function TrainBuildingBody({ village, id, onTrain, onCancelTrain, busy, go }) {
+export function TrainBuildingBody({ village, id, onTrain, onDecommission, onCancelTrain, busy, go }) {
   const [mode, setMode] = useState("train");
   return (
     <>
@@ -488,6 +490,7 @@ export function TrainBuildingBody({ village, id, onTrain, onCancelTrain, busy, g
         queueId={id}
         isTrain={mode === "train"}
         onTrain={onTrain}
+        onDecommission={onDecommission}
         onCancelTrain={onCancelTrain}
         busy={busy}
         go={go}
@@ -496,7 +499,7 @@ export function TrainBuildingBody({ village, id, onTrain, onCancelTrain, busy, g
   );
 }
 
-export function TrainBuildingScreen({ village, id, onTrain, onCancelTrain, busy, go }) {
+export function TrainBuildingScreen({ village, id, onTrain, onDecommission, onCancelTrain, busy, go }) {
   const b = B[id];
   const level = levelOf(village, b.type);
   return (
@@ -514,7 +517,7 @@ export function TrainBuildingScreen({ village, id, onTrain, onCancelTrain, busy,
           </tr>
         </tbody>
       </table>
-      {level > 0 && <TrainBuildingBody village={village} id={id} onTrain={onTrain} onCancelTrain={onCancelTrain} busy={busy} go={go} />}
+      {level > 0 && <TrainBuildingBody village={village} id={id} onTrain={onTrain} onDecommission={onDecommission} onCancelTrain={onCancelTrain} busy={busy} go={go} />}
     </>
   );
 }

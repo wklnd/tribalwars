@@ -117,6 +117,7 @@ export const api = {
   mintCoin: (count = 1, villageId = null) => request("/village/coin", { method: "POST", body: JSON.stringify({ count, villageId }) }),
   cancelBuild: (id) => request("/village/build/" + id, { method: "DELETE" }),
   train: (type, count) => request("/village/train", { method: "POST", body: JSON.stringify({ type, count }) }),
+  decommission: (type, count) => request("/village/decommission", { method: "POST", body: JSON.stringify({ type, count }) }),
   player: (name) => request("/players/" + encodeURIComponent(name)),
   playerStats: (name, range) => request("/players/" + encodeURIComponent(name) + "/stats?range=" + range),
   editProfile: (body) => request("/profile", { method: "PUT", body: JSON.stringify(body) }),

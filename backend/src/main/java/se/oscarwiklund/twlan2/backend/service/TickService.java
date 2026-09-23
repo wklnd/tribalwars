@@ -117,8 +117,10 @@ public class TickService {
                 int delta = newProduced - item.getProducedCount();
                 Village village = item.getVillage();
                 villageById.putIfAbsent(village.getId(), village);
-                produced.computeIfAbsent(village.getId(), k -> new EnumMap<>(UnitType.class)).merge(item.getType(), delta, Integer::sum);
-                achievements.count(village.getOwner(), village.getWorld(), "recruited", delta);
+                // a decommission order removes units instead of adding them, so its delta is negative
+                produced.computeIfAbsent(village.getId(), k -> new EnumMap<>(UnitType.class))
+                        .merge(item.getType(), item.isDecommission() ? -delta : delta, Integer::sum);
+                if (!item.isDecommission()) achievements.count(village.getOwner(), village.getWorld(), "recruited", delta);
                 item.setProducedCount(newProduced);
             }
             if (item.getProducedCount() >= item.getTotalCount()) {
@@ -141,7 +143,7 @@ public class TickService {
                         stock.setVillage(village);
                         stock.setType(e.getKey());
                     }
-                    stock.setCount(stock.getCount() + e.getValue());
+                    stock.setCount(Math.max(0, stock.getCount() + e.getValue())); // clamp: a decommission delta is negative
                     unitStockRepository.save(stock);
                 }
             }

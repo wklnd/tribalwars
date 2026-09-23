@@ -151,7 +151,7 @@ public class GameFacade {
         }
 
         List<TrainQueueDto> trainQueueDtos = trainQueueItemRepository.findByVillageOrderByPositionAsc(village).stream()
-                .map(t -> new TrainQueueDto(t.getType().name(), t.getTotalCount(), t.getProducedCount(), t.getStartedAt(), t.getCompletesAt(), t.getId(), t.getPerUnitSeconds()))
+                .map(t -> new TrainQueueDto(t.getType().name(), t.getTotalCount(), t.getProducedCount(), t.getStartedAt(), t.getCompletesAt(), t.getId(), t.getPerUnitSeconds(), t.isDecommission()))
                 .toList();
 
         List<UnitCostDto> unitCosts = Arrays.stream(UnitType.values())

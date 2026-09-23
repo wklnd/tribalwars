@@ -42,6 +42,14 @@ public class TrainController {
         return gameFacade.toDto(village);
     }
 
+    @PostMapping("/api/village/decommission")
+    public VillageStateDto decommission(@RequestBody TrainRequest request) {
+        Village village = gameFacade.playerHomeVillage();
+        UnitType type = UnitType.valueOf(request.type());
+        trainService.decommission(village, type, request.count());
+        return gameFacade.toDto(village);
+    }
+
     public record ResearchRequest(String type) {}
 
     @PostMapping("/api/village/research")

@@ -126,6 +126,57 @@ public class TrainService {
         return trainQueueItemRepository.save(item);
     }
 
+    // No resource cost and no refund on cancel: the units are removed from the village's stock only once the
+    // order completes, exactly like recruiting in reverse (TickService.processTrainQueues). Shares the recruit
+    // building's queue with ordinary recruiting (see TrainQueues, and the original's queue.php which renders
+    // both together). The timer reuses the classic recruit-time formula - decommission timing is compiled in
+    // the original and not readable, so this is the natural symmetric default, not a verified value.
+    @Transactional(noRollbackFor = TrainException.class)
+    public TrainQueueItem decommission(Village village, UnitType type, int count) {
+        if (count <= 0) {
+            throw new TrainException("Count must be positive");
+        }
+        if (type == UnitType.PALADIN || type == UnitType.SNOB) {
+            throw new TrainException(type.displayName() + " cannot be decommissioned");
+        }
+        BuildingType building = type.recruitBuilding;
+        int buildingLevel = villageService.levelOf(village, building);
+        if (buildingLevel < 1) {
+            throw new TrainException("Requires a " + building.displayName());
+        }
+
+        int atHome = unitStockRepository.findByVillageAndType(village, type).map(UnitStock::getCount).orElse(0);
+        int alreadyQueued = trainQueueItemRepository.findByVillageOrderByPositionAsc(village).stream()
+                .filter(q -> q.isDecommission() && q.getType() == type)
+                .mapToInt(q -> q.getTotalCount() - q.getProducedCount())
+                .sum();
+        if (count > atHome - alreadyQueued) {
+            throw new TrainException("Not enough " + type.displayName() + " at home to decommission");
+        }
+
+        double speedFactor = Math.max(0.1, 1 - (buildingLevel * 0.02)) * BonusType.recruitTimeFactor(village, building);
+        long perUnitSeconds = settings.scaleSeconds(village, type.buildTimeSeconds * speedFactor);
+
+        List<TrainQueueItem> queue = trainQueues.of(village, building);
+
+        TrainQueueItem item = new TrainQueueItem();
+        item.setVillage(village);
+        item.setType(type);
+        item.setTotalCount(count);
+        item.setProducedCount(0);
+        item.setPerUnitSeconds(perUnitSeconds);
+        item.setPosition(queue.size());
+        item.setDecommission(true);
+
+        if (queue.isEmpty()) {
+            Instant now = Instant.now();
+            item.setStartedAt(now);
+            item.setCompletesAt(now.plusSeconds(perUnitSeconds * count));
+        }
+
+        return trainQueueItemRepository.save(item);
+    }
+
     // state = HOME/AWAY/TRAINING for the village's owner, or the record is null when there is none.
     public record PaladinStatus(String state, Village at) {}
 
@@ -167,12 +218,15 @@ public class TrainService {
         List<TrainQueueItem> queue = trainQueueItemRepository.findByVillageOrderByPositionAsc(village);
         TrainQueueItem target = queue.stream().filter(q -> q.getId().equals(itemId)).findFirst()
                 .orElseThrow(() -> new TrainException("No such recruitment order"));
-        int remaining = target.getTotalCount() - target.getProducedCount();
-        int capacity = villageService.warehouseCapacity(village);
-        UnitType t = target.getType();
-        village.setWood(Math.max(village.getWood(), Math.min(capacity, village.getWood() + Math.floor(t.woodCost * remaining * 0.9))));
-        village.setClay(Math.max(village.getClay(), Math.min(capacity, village.getClay() + Math.floor(t.clayCost * remaining * 0.9))));
-        village.setIron(Math.max(village.getIron(), Math.min(capacity, village.getIron() + Math.floor(t.ironCost * remaining * 0.9))));
+        if (!target.isDecommission()) {
+            // nothing was spent to queue a decommission order, so there is nothing to refund on cancel
+            int remaining = target.getTotalCount() - target.getProducedCount();
+            int capacity = villageService.warehouseCapacity(village);
+            UnitType t = target.getType();
+            village.setWood(Math.max(village.getWood(), Math.min(capacity, village.getWood() + Math.floor(t.woodCost * remaining * 0.9))));
+            village.setClay(Math.max(village.getClay(), Math.min(capacity, village.getClay() + Math.floor(t.clayCost * remaining * 0.9))));
+            village.setIron(Math.max(village.getIron(), Math.min(capacity, village.getIron() + Math.floor(t.ironCost * remaining * 0.9))));
+        }
         trainQueueItemRepository.delete(target);
 
         trainQueues.resequence(village, Instant.now());
