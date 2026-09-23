@@ -58,7 +58,7 @@ export function ProfileScreen({ name, go }) {
                       ) : "—"}
                     </td>
                   </tr>
-                  <tr><td>Villages:</td><td>{p.villages.length}</td></tr>
+                  <tr><td>Villages:</td><td>{(p.villages ?? []).length}</td></tr>
                   <tr><td>Opponents defeated:</td><td>{fmt(p.kills)}</td></tr>
                   <tr><td>Player since:</td><td>{fmtDay(p.memberSince)}</td></tr>
                   {p.birthday && <tr><td>Birthday:</td><td>{fmtDay(p.birthday)}</td></tr>}
@@ -73,7 +73,7 @@ export function ProfileScreen({ name, go }) {
                     <th>Coordinates</th>
                     <th>Points</th>
                   </tr>
-                  {p.villages.map((v) => (
+                  {(p.villages ?? []).map((v) => (
                     <tr key={v.id}>
                       <td>{v.name}</td>
                       <td>{`${v.x}|${v.y} ${continentOf(v)}`}</td>

@@ -20,7 +20,7 @@ const rawStyle = (css) => (el) => {
 // Observed on the real overview: the headquarters shows its animated .gif while the build queue is not empty,
 // the resource pits while that resource is below the warehouse capacity; nothing else is animated.
 function animatedNow(b, village) {
-  if (b.id === "main") return village.buildQueue.length > 0;
+  if (b.id === "main") return (village.buildQueue ?? []).length > 0;
   const res = { wood: village.wood, stone: village.clay, iron: village.iron }[b.id];
   return res !== undefined && res < village.warehouseCapacity;
 }
@@ -88,7 +88,7 @@ function HiddenWidget({ id, dragProps }) {
 function extraInfo(b, ctx) {
   const { village, fetchedAt, strong } = ctx;
   if (b.id === "main") {
-    const active = village.buildQueue.find((q) => q.completesAt);
+    const active = (village.buildQueue ?? []).find((q) => q.completesAt);
     if (!active) return null;
     return new Date(active.completesAt).getTime() <= Date.now() ? <span className="warn">overdue</span> : <Timer target={active.completesAt} />;
   }
@@ -415,13 +415,13 @@ function BuildQueue({ village, onCancelBuild }) {
   return (
     <table width="100%" id="overview_buildqueue" className="vis">
       <tbody>
-        {village.buildQueue.map((q, i) => {
+        {(village.buildQueue ?? []).map((q, i) => {
           const b = SCENE.find((x) => x.type === q.type);
-          const info = village.buildings.find((x) => x.type === q.type);
+          const info = (village.buildings ?? []).find((x) => x.type === q.type);
           const active = !!q.completesAt;
           const remaining = active ? new Date(q.completesAt).getTime() - Date.now() : null;
           // duration of a not yet started order: scale the next-level time by the original's 1.2 time factor
-          const waitingSecs = q.durationSeconds ?? (info ? Math.round(info.nextSeconds * 1.2 ** (q.targetLevel - (info.level + village.buildQueue.filter((x) => x.type === q.type).length + 1))) : 0);
+          const waitingSecs = q.durationSeconds ?? (info ? Math.round(info.nextSeconds * 1.2 ** (q.targetLevel - (info.level + (village.buildQueue ?? []).filter((x) => x.type === q.type).length + 1))) : 0);
           return (
             <tr key={i} className="queueRow" style={{ height: 50 }}>
               <td width="40px" align="center">
@@ -564,7 +564,7 @@ export function OverviewScreen({ village, villages = [], go, onBuild, busy, onCa
       case "units":
         return { active: true, body: <Units village={village} go={go} /> };
       case "buildqueue":
-        return village.buildQueue.length > 0
+        return (village.buildQueue ?? []).length > 0
           ? { active: true, body: <BuildQueue village={village} onCancelBuild={onCancelBuild} /> }
           : { active: false };
       case "notes":

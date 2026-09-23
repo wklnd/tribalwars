@@ -291,7 +291,7 @@ function BuildingWrapper({ village, live, go, onBuild }) {
   const active = [];
   const inactive = [];
   for (const id of ORDER) {
-    const dto = B[id].type ? village.buildings.find((x) => x.type === B[id].type) : null;
+    const dto = B[id].type ? (village.buildings ?? []).find((x) => x.type === B[id].type) : null;
     if ((dto?.requirementsMet ?? reqsMet(village, id)) || levelOfId(village, id) > 0) active.push(id);
     else inactive.push(id);
   }

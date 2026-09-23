@@ -69,34 +69,43 @@ public class TickService {
     void processBuildQueues(Instant now) {
         List<BuildQueueItem> due = buildQueueItemRepository.findByCompletesAtLessThanEqual(now);
         for (BuildQueueItem item : due) {
-            Village village = item.getVillage();
-            Building building = buildingRepository.findByVillageAndType(village, item.getType())
-                    .orElseGet(() -> {
-                        Building b = new Building();
-                        b.setVillage(village);
-                        b.setType(item.getType());
-                        b.setLevel(0);
-                        return b;
-                    });
-            building.setLevel(item.getTargetLevel());
-            buildingRepository.save(building);
-            buildQueueItemRepository.delete(item);
-            achievements.count(village.getOwner(), village.getWorld(), "levels", 1);
-            live.village(village);
-            if (village.getOwner() != null && !village.getOwner().isNpc() && village.getWorld() != null) live.toWorld(village.getWorld().getId(), LiveUpdates.MAP); // (its points changed)
+            completeBuildItem(item, now);
+        }
+    }
 
-            List<BuildQueueItem> rest = buildQueueItemRepository.findByVillageOrderByPositionAsc(village);
-            for (int i = 0; i < rest.size(); i++) {
-                BuildQueueItem next = rest.get(i);
-                next.setPosition(i);
-                if (i == 0 && next.getStartedAt() == null) {
-                    int hqLevel = villageService.levelOf(village, BuildingType.HEADQUARTERS);
-                    next.setStartedAt(now);
-                    next.setCompletesAt(now.plusSeconds(next.getType().buildTimeSeconds(
-                            next.getTargetLevel(), hqLevel, settings.speedOf(village), WorldSettings.number(village.getWorld(), "buildMainFactor"))));
-                }
-                buildQueueItemRepository.save(next);
+    // Applies one build order and resequences the rest of its village's queue. Also called directly by
+    // BuildService.finishFree for just the one item being force-completed, instead of that going through the
+    // server-wide processBuildQueues (which used to touch every due item's village/building rows, needlessly
+    // widening the window in which it could collide with the real scheduled tick on unrelated villages and
+    // occasionally deadlocked H2 on the `building` table).
+    void completeBuildItem(BuildQueueItem item, Instant now) {
+        Village village = item.getVillage();
+        Building building = buildingRepository.findByVillageAndType(village, item.getType())
+                .orElseGet(() -> {
+                    Building b = new Building();
+                    b.setVillage(village);
+                    b.setType(item.getType());
+                    b.setLevel(0);
+                    return b;
+                });
+        building.setLevel(item.getTargetLevel());
+        buildingRepository.save(building);
+        buildQueueItemRepository.deleteByIdSafe(item.getId());
+        achievements.count(village.getOwner(), village.getWorld(), "levels", 1);
+        live.village(village);
+        if (village.getOwner() != null && !village.getOwner().isNpc() && village.getWorld() != null) live.toWorld(village.getWorld().getId(), LiveUpdates.MAP); // (its points changed)
+
+        List<BuildQueueItem> rest = buildQueueItemRepository.findByVillageOrderByPositionAsc(village);
+        for (int i = 0; i < rest.size(); i++) {
+            BuildQueueItem next = rest.get(i);
+            next.setPosition(i);
+            if (i == 0 && next.getStartedAt() == null) {
+                int hqLevel = villageService.levelOf(village, BuildingType.HEADQUARTERS);
+                next.setStartedAt(now);
+                next.setCompletesAt(now.plusSeconds(next.getType().buildTimeSeconds(
+                        next.getTargetLevel(), hqLevel, settings.speedOf(village), WorldSettings.number(village.getWorld(), "buildMainFactor"))));
             }
+            buildQueueItemRepository.save(next);
         }
     }
 
@@ -150,7 +159,7 @@ public class TickService {
         }
         for (TrainQueueItem item : finished) {
             Village village = item.getVillage();
-            trainQueueItemRepository.delete(item);
+            trainQueueItemRepository.deleteByIdSafe(item.getId());
             trainQueues.resequence(village, now);
         }
     }

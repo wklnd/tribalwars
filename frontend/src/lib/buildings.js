@@ -185,12 +185,12 @@ export function levelOfId(village, id) {
   const b = B[id];
   if (!b) return 0;
   if (!b.type) return b.start;
-  return village.buildings.find((x) => x.type === b.type)?.level ?? 0;
+  return (village.buildings ?? []).find((x) => x.type === b.type)?.level ?? 0;
 }
 
 export function queuedOfId(village, id) {
   const t = B[id]?.type;
-  return t ? village.buildQueue.filter((q) => q.type === t).length : 0;
+  return t ? (village.buildQueue ?? []).filter((q) => q.type === t).length : 0;
 }
 
 export function tierFor(id, level) {
@@ -224,7 +224,7 @@ export function buildInfo(village, id) {
   const level = levelOfId(village, id);
   const queued = queuedOfId(village, id);
   const lvl = level + queued;
-  const dto = b.type ? village.buildings.find((x) => x.type === b.type) : null;
+  const dto = b.type ? (village.buildings ?? []).find((x) => x.type === b.type) : null;
   const maxed = dto ? dto.maxedOrQueued : lvl >= b.max;
   const hq = levelOfId(village, "main");
   const c = costAt(id, lvl + 1, hq);

@@ -125,7 +125,10 @@ public class BuildService {
         }
         item.setCompletesAt(now);
         buildQueueItemRepository.save(item);
-        tickService.processBuildQueues(now);
+        // Completes just this item, not tickService.processBuildQueues(now) - that would process every other
+        // due item server-wide too, widening the window to collide with the real scheduled tick (it used to
+        // occasionally deadlock H2 on the `building` table when both touched an unrelated village at once).
+        tickService.completeBuildItem(item, now);
         achievements.count(village.getOwner(), village.getWorld(), "instant", 1);
     }
 
@@ -148,7 +151,7 @@ public class BuildService {
             village.setClay(Math.max(village.getClay(), Math.min(capacity, village.getClay() + q.getType().clayCost(q.getTargetLevel()) * mult)));
             village.setIron(Math.max(village.getIron(), Math.min(capacity, village.getIron() + q.getType().ironCost(q.getTargetLevel()) * mult)));
         }
-        buildQueueItemRepository.deleteAll(removed);
+        for (BuildQueueItem q : removed) buildQueueItemRepository.deleteByIdSafe(q.getId());
 
         List<BuildQueueItem> rest = queue.stream().filter(q -> !removed.contains(q)).toList();
         Instant now = Instant.now();

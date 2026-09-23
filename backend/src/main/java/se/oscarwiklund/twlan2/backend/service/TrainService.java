@@ -227,7 +227,7 @@ public class TrainService {
             village.setClay(Math.max(village.getClay(), Math.min(capacity, village.getClay() + Math.floor(t.clayCost * remaining * 0.9))));
             village.setIron(Math.max(village.getIron(), Math.min(capacity, village.getIron() + Math.floor(t.ironCost * remaining * 0.9))));
         }
-        trainQueueItemRepository.delete(target);
+        trainQueueItemRepository.deleteByIdSafe(target.getId());
 
         trainQueues.resequence(village, Instant.now());
     }

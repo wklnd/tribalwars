@@ -92,9 +92,9 @@ export function bigImageFile(b, level) {
 export function sceneLevels(village) {
   const out = {};
   for (const b of SCENE) {
-    const info = b.type ? village.buildings.find((x) => x.type === b.type) : null;
+    const info = b.type ? (village.buildings ?? []).find((x) => x.type === b.type) : null;
     const level = info ? info.level : (b.fixedLevel ?? 0);
-    const queued = b.type ? village.buildQueue.filter((q) => q.type === b.type).length : 0;
+    const queued = b.type ? (village.buildQueue ?? []).filter((q) => q.type === b.type).length : 0;
     out[b.id] = { level, queued, info };
   }
   return out;
