@@ -9,6 +9,7 @@ import se.oscarwiklund.twlan2.backend.service.npc.NpcDifficulty;
 import se.oscarwiklund.twlan2.backend.service.npc.NpcEconomy;
 import se.oscarwiklund.twlan2.backend.service.npc.NpcLogService;
 import se.oscarwiklund.twlan2.backend.service.npc.NpcMilitary;
+import se.oscarwiklund.twlan2.backend.service.npc.NpcOverrunCooldown;
 import se.oscarwiklund.twlan2.backend.service.npc.NpcProfiles;
 import se.oscarwiklund.twlan2.backend.service.npc.NpcRetirement;
 import se.oscarwiklund.twlan2.backend.service.npc.NpcRhythm;
@@ -64,6 +65,7 @@ public class NpcService {
     private final NpcMilitary military;
     private final NpcDefence defence;
     private final NpcRhythm rhythm;
+    private final NpcOverrunCooldown overrun;
     private final Map<Long, Personality> personalities = new java.util.concurrent.ConcurrentHashMap<>();
     private final WorldPoints worldPoints;
     private final TribeService tribeService;
@@ -78,11 +80,12 @@ public class NpcService {
                       BuildService buildService, TrainService trainService, MovementRepository movements,
                       MovementService movementService, NobleService nobles, NpcTribeService npcTribes, TribeService tribeService, NpcMarketService npcMarket, NpcLogService npcLog,
                       NpcProfiles npcProfiles, NpcEconomy economy, NpcMilitary military, NpcDefence defence, NpcRhythm rhythm, WorldPoints worldPoints,
-                      PlatformTransactionManager transactionManager, @Value("${game.npc-budget-ms:2500}") long budgetMs) {
+                      NpcOverrunCooldown overrun, PlatformTransactionManager transactionManager, @Value("${game.npc-budget-ms:2500}") long budgetMs) {
         this.tx = new TransactionTemplate(transactionManager);
         this.budgetMs = budgetMs;
         this.defence = defence;
         this.rhythm = rhythm;
+        this.overrun = overrun;
         this.military = military;
         this.worldPoints = worldPoints;
         this.npcProfiles = npcProfiles;
@@ -229,15 +232,17 @@ public class NpcService {
         // snap = what the village looked like when the step began (levels do not change during a step, only the queues).
         NpcEconomy.Snapshot snap = economy.load(v);
         noblesWanted(v, archetype, difficulty, snap);
+        // just wiped out: hold off recruiting for a real-world grace period so a follow-up attack can snipe it
+        boolean recovering = overrun.isRecovering(v.getId());
         if (rnd.nextDouble() < (1 - skill) * 0.5) {
             // a slip: does something off the plan (the visible mistakes of a weak NPC)
             if (snap.build.size() < 2) build(v, snap, me);
-            recruit(v, me, snap);
+            if (!recovering) recruit(v, me, snap);
         } else {
             if (economy.build(v, archetype, difficulty, snap, rnd) == NpcEconomy.Build.NOTHING_LEFT && snap.build.size() < 2) {
                 build(v, snap, me); // the plan is finished: keep developing at random
             }
-            economy.recruit(v, archetype, skill, difficulty, snap, view.from(v), view.underAttack(v), rnd);
+            if (!recovering) economy.recruit(v, archetype, skill, difficulty, snap, view.from(v), view.underAttack(v), rnd);
         }
         long t1 = System.nanoTime();
         educateNoble(v, archetype, difficulty, snap);

@@ -5,6 +5,7 @@ import se.oscarwiklund.twlan2.backend.domain.*;
 import se.oscarwiklund.twlan2.backend.service.npc.NpcDifficulty;
 import se.oscarwiklund.twlan2.backend.service.npc.NpcIntelService;
 import se.oscarwiklund.twlan2.backend.service.npc.NpcLogService;
+import se.oscarwiklund.twlan2.backend.service.npc.NpcOverrunCooldown;
 import se.oscarwiklund.twlan2.backend.repo.BuildingRepository;
 import se.oscarwiklund.twlan2.backend.repo.CombatReportRepository;
 import se.oscarwiklund.twlan2.backend.repo.MovementRepository;
@@ -37,15 +38,17 @@ public class CombatService {
     private final WarService wars;
     private final NpcLogService npcLog;
     private final NpcIntelService npcIntel;
+    private final NpcOverrunCooldown overrun;
 
     public CombatService(LiveUpdates live, UnitStockRepository unitStockRepository, CombatReportRepository combatReportRepository,
                           VillageService villageService, AchievementService achievements, ConquestService conquests,
                           BuildingRepository buildingRepository, VillageRepository villageRepository,
                           MovementRepository movementRepository, SupportService support, WarService wars, NpcLogService npcLog,
-                          NpcIntelService npcIntel) {
+                          NpcIntelService npcIntel, NpcOverrunCooldown overrun) {
         this.live = live;
         this.npcIntel = npcIntel;
         this.npcLog = npcLog;
+        this.overrun = overrun;
         this.support = support;
         this.wars = wars;
         this.buildingRepository = buildingRepository;
@@ -143,6 +146,13 @@ public class CombatService {
             achievements.count(supporter, world, "support_battles", 1);
             Long lost = supporterLosses.get(supporter.getId());
             if (lost != null) achievements.count(supporter, world, "support_losses", lost);
+        }
+        // every defender (garrison + guests) was wiped out: give the NPC a real-world grace period before it starts
+        // recruiting again, so a follow-up attack has a genuine chance to snipe the village while it's still weak
+        if (outcome == BattleOutcome.ATTACKER_WIN && !scoutsOnly && previousOwner != null && previousOwner.isNpc()
+                && !defenderUnits.isEmpty()
+                && defenderUnits.entrySet().stream().allMatch(e -> defenderLosses.getOrDefault(e.getKey(), 0) >= e.getValue())) {
+            overrun.markOverrun(defenderVillage.getId());
         }
 
         // scouts that made it through report what they saw on arrival: the village as it was before the battle
