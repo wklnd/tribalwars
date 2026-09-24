@@ -54,10 +54,14 @@ public class NpcIntelService {
         return out;
     }
 
-    // True while the garrison picture is recent enough to attack on.
+    // True while the garrison picture is recent enough to attack on. The speed multiplier is capped at 50 (like
+    // decayed() below) - without the cap, a world running at several hundred/thousand x speed turns the 90
+    // "world minutes" into single-digit REAL seconds, shorter than the NPC tick interval itself: intel goes stale
+    // before an NPC ever gets a chance to act on it, so it only ever re-scouts and never actually attacks (observed
+    // live: near-zero battles logged on x500/x1000 worlds despite heavy, healthy scouting activity).
     public static boolean fresh(NpcIntel i, double worldSpeed, Instant now) {
         if (i == null || i.getSeenAt() == null || i.getTroops() == null) return false;
-        double worldSeconds = Duration.between(i.getSeenAt(), now).toMillis() / 1000.0 * Math.max(1, worldSpeed);
+        double worldSeconds = Duration.between(i.getSeenAt(), now).toMillis() / 1000.0 * Math.min(50, Math.max(1, worldSpeed));
         return worldSeconds <= FRESH_WORLD_SECONDS;
     }
 
