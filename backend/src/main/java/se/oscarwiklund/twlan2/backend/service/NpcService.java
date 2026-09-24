@@ -380,8 +380,12 @@ public class NpcService {
         Account owner = v.getOwner();
         int need = noblesNeeded(world), have = noblesHave(snap);
         try {
-            if (nobles.info(owner, world).possible() <= 0) nobles.mint(v);
-            if (nobles.info(owner, world).possible() > 0) {
+            NobleService.Info info = nobles.info(owner, world);
+            if (info.possible() <= 0) {
+                nobles.mint(v);
+                info = nobles.info(owner, world);
+            }
+            if (info.possible() > 0) {
                 trainService.enqueue(v, UnitType.SNOB, 1);
                 npcLog.add(world, owner, v, "NOBLE", "Educating a nobleman in " + v.getName() + " (" + (have + 1) + " of " + need + " for a conquest)");
             }
